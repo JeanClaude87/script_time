@@ -55,7 +55,8 @@ for kk,cose in enumerate(names):
 			print(corr_conn.shape)
 		else:
 			corr_conn = ff.CorCon_exp(filename,L_int,t_max)
-			print(filename)
+			np.savetxt(dir_path+'/corr_con.prp', media, fmt='%.9f')
+			print(filename, corr_conn.shape)
 
 		Big_Mat[i] = corr_conn
 		i+=1
