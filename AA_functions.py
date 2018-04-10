@@ -13,8 +13,72 @@ from numpy import inf
 import re
 import fnmatch
 
+#......................................................Traslations MEAN
+def giveback_correlation(uga,t_max):
+	str_spl_tmp = re.split('L',uga)
+	str_spl     = re.split('_|/',str_spl_tmp[1])
 
-#.............................................Traslations MEAN
+	L = str_spl[1]
+	D = str_spl[3]
+	L_int  = int(L)
+
+	dir_path  = os.path.dirname(uga)
+	corrcon_file = dir_path+'/corr_con.prp'
+
+	if os.path.isfile(corrcon_file) :
+		ciao=0
+	else:
+		corr_conn = CorCon_exp(uga)
+		np.savetxt(dir_path+'/corr_con.prp', corr_conn, fmt='%.9f')
+		print(uga, corr_conn.shape)
+
+#.............................................Export connected function
+def	CorCon_exp(filename):
+
+	str_spl_tmp = re.split('L',filename)
+	str_spl     = re.split('_|/',str_spl_tmp[1])
+
+	dir_path  = os.path.dirname(filename)
+	corr_file = dir_path+'/corr.prp'
+	dens_file = dir_path+'/dens.prp'
+	corrcon_file = dir_path+'/corr_con.prp'
+
+	if os.path.isfile(corrcon_file) :
+		ciao=0
+		print(corrcon_file, "FATTO")
+	
+	else:
+
+		corr = np.loadtxt(corr_file, dtype=np.float)	
+		dens = np.loadtxt(dens_file, dtype=np.float)
+
+		L = int(np.amax(dens[:,1]))+1
+
+		lt_corr = int(np.shape(corr)[0]/(L*L))
+		lt_dens = int(np.shape(dens)[0]/(L))
+		
+		corr_tab  = np.reshape(corr[:,2],(lt_corr,L,L))
+		dens_tab  = np.reshape(dens[:,2],(lt_dens,L))
+
+		t_max = int(np.amin([lt_corr,lt_dens]))
+
+		corr_aver = np.zeros((t_max,L+1))
+
+		for x in range(0,t_max):
+			dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
+			data_tab0 = corr_tab[x]-dens_dens
+			data_tab  = Trasl_Mean(data_tab0)
+
+			corr_aver[x] = np.append(data_tab,data_tab[0])
+
+		print(corrcon_file)
+		np.savetxt(corrcon_file, corr_aver, fmt='%.9f')
+
+	return 1
+
+
+
+#......................................................Traslations MEAN
 def Trasl_Mean(A):
 	a = A.shape
 	B = np.zeros((a[1],a[1]), dtype=np.float)
@@ -22,45 +86,7 @@ def Trasl_Mean(A):
 		B[i] = np.roll(A[i],-i)
 	return np.mean(B, axis=0)
 
-#.................Export connected function
-def	CorCon_exp(filename,L_int,t_max):
-
-	dir_path  = os.path.dirname(filename)
-	corr_file = dir_path+'/corr.prp'
-	dens_file = dir_path+'/dens.prp'
-	corrcon_file = dir_path+'/corr_con.prp'
-
-	#...........find Size
-	corr = np.loadtxt(corr_file, dtype=np.float)	
-	dens = np.loadtxt(dens_file, dtype=np.float)
-
-	corr_conn  = CorCon_TrAver(corr,dens,L_int,t_max)
-
-	np.savetxt(corrcon_file, corr_conn, fmt='%.9f')
-
-	return corr_conn
-
-#.................Average over Trasl of the connected function
-def CorCon_TrAver(A,B,lx,t):
-	#...A->corr
-	#...B->dens	
-	ltA = int(np.shape(A)[0]/(lx*lx))
-	ltB = int(np.shape(B)[0]/(lx))
-
-	corr_tab  = np.reshape(A[:,2],(ltA,lx,lx))
-	dens_tab  = np.reshape(B[:,2],(ltB,lx))
-
-	corr_aver = np.empty((int(t),lx))
-	corr_aver[:] = np.nan
-
-	for x in range(0,np.amin([ltA,ltB])):
-		dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
-		data_tab  = corr_tab[x]-dens_dens
-		corr_aver[x] = Trasl_Mean(data_tab)
-	return corr_aver
-
-
-#.............................................creation of folder
+#....................................................creation of folder
 def	folder_crea(directory):
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
@@ -83,7 +109,7 @@ def	folder_crea(directory):
 	return xx
 
 
-#.............................................FileName_abstime
+#......................................................FileName_abstime
 def generate_filename(basename):
 	unix_timestamp = int(time.time())
 	local_time = str(int(round(time.time() * 1000)))
@@ -93,7 +119,7 @@ def generate_filename(basename):
 		return generate_filename(basename)
 	return xx		
 
-#.....................................................FindName
+#..............................................................FindName
 def find_files(treeroot, pattern):
 	results = []
 	for base, dirs, files in os.walk(treeroot):
