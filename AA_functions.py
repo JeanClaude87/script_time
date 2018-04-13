@@ -1,9 +1,9 @@
+import csv
 import numpy as np
 import math
 import scipy.linalg as _la
 import scipy.special as special
-from math import factorial
-import time 
+from math import factorial 
 from datetime import datetime
 import time
 import re
@@ -12,6 +12,7 @@ from glob import glob
 from numpy import inf
 import re
 import fnmatch
+import pandas as pd
 
 #......................................................Traslations MEAN
 def giveback_correlation(uga,t_max):
@@ -49,8 +50,12 @@ def	CorCon_exp(filename):
 	
 	else:
 
-		corr = np.loadtxt(corr_file, dtype=np.float)	
-		dens = np.loadtxt(dens_file, dtype=np.float)
+		CC   = pd.read_csv(corr_file, header=None, sep=r"\s+")
+		corr = pd.DataFrame.as_matrix(CC)
+
+		DD   = pd.read_csv(dens_file, header=None, sep=r"\s+")
+		dens = pd.DataFrame.as_matrix(DD)
+
 
 		L = int(np.amax(dens[:,1]))+1
 
