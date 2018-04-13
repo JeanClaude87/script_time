@@ -8,36 +8,21 @@ from datetime import datetime
 import time
 import re
 import os as os
-from glob import glob
+import glob
 from numpy import inf
 import re
 import fnmatch
 import pandas as pd
 
-#......................................................Traslations MEAN
-def giveback_correlation(uga,t_max):
-	str_spl_tmp = re.split('L',uga)
-	str_spl     = re.split('_|/',str_spl_tmp[1])
-
-	L = str_spl[1]
-	D = str_spl[3]
-	L_int  = int(L)
-
-	dir_path  = os.path.dirname(uga)
-	corrcon_file = dir_path+'/corr_con.prp'
-
-	if os.path.isfile(corrcon_file) :
-		ciao=0
-	else:
-		corr_conn = CorCon_exp(uga)
-		np.savetxt(dir_path+'/corr_con.prp', corr_conn, fmt='%.9f')
-		print(uga, corr_conn.shape)
 
 #.............................................Export connected function
 def	CorCon_exp(filename):
 
 	str_spl_tmp = re.split('L',filename)
 	str_spl     = re.split('_|/',str_spl_tmp[1])
+
+	L = str_spl[1]
+	D = str_spl[3]
 
 	dir_path  = os.path.dirname(filename)
 	corr_file = dir_path+'/corr.prp'
@@ -57,17 +42,17 @@ def	CorCon_exp(filename):
 		dens = pd.DataFrame.as_matrix(DD)
 
 
-		L = int(np.amax(dens[:,1]))+1
+		Lint = int(np.amax(dens[:,1]))+1
 
-		lt_corr = int(np.shape(corr)[0]/(L*L))
-		lt_dens = int(np.shape(dens)[0]/(L))
+		lt_corr = int(np.shape(corr)[0]/(Lint*Lint))
+		lt_dens = int(np.shape(dens)[0]/(Lint))
 		
-		corr_tab  = np.reshape(corr[:,2],(lt_corr,L,L))
-		dens_tab  = np.reshape(dens[:,2],(lt_dens,L))
+		corr_tab  = np.reshape(corr[:,2],(lt_corr,Lint,Lint))
+		dens_tab  = np.reshape(dens[:,2],(lt_dens,Lint))
 
 		t_max = int(np.amin([lt_corr,lt_dens]))
 
-		corr_aver = np.zeros((t_max,L+1))
+		corr_aver = np.zeros((t_max,Lint+1))
 
 		for x in range(0,t_max):
 			dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
@@ -77,7 +62,13 @@ def	CorCon_exp(filename):
 			corr_aver[x] = np.append(data_tab,data_tab[0])
 
 		print(corrcon_file)
-		np.savetxt(corrcon_file, corr_aver, fmt='%.9f')
+
+		namefold = '/L_'+L+'/D_'+D+'/corr_con'
+		dirdat   = os.path.abspath(glob.glob('../datas')[0])
+		
+		namegen  = generate_filename(dirdat+os.sep+namefold)
+
+		np.savetxt(namegen, corr_aver, fmt='%.9f')
 
 	return 1
 
@@ -103,10 +94,16 @@ def	folder_crea(directory):
 
 		names[j][0] = L
 		names[j][1] = D
+		dirDT_path = '../datas/L_'+L+'/D_'+D
+
+		if not os.path.exists(dirDT_path):
+			os.makedirs(dirDT_path)
+
 		dirAV_path = '../average/L_'+L+'/D_'+D
 
 		if not os.path.exists(dirAV_path):
 			os.makedirs(dirAV_path)
+
 
 		j+=1
 
