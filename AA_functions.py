@@ -18,6 +18,7 @@ import pandas as pd
 #.............................................Export connected function
 def	CorCon_exp(filename):
 
+	
 	str_spl_tmp = re.split('L',filename)
 	str_spl     = re.split('_|/',str_spl_tmp[1])
 
@@ -29,46 +30,48 @@ def	CorCon_exp(filename):
 	dens_file = dir_path+'/dens.prp'
 	corrcon_file = dir_path+'/corr_con.prp'
 
-	if os.path.isfile(corrcon_file) :
-		ciao=0
-		print(corrcon_file, "FATTO")
+	print(corrcon_file)
+
+	#if os.path.isfile(corrcon_file) :
+	#	ciao=0
+	#	print(corrcon_file, "FATTO")
 	
-	else:
+	#else:
 
-		CC   = pd.read_csv(corr_file, header=None, sep=r"\s+")
-		corr = pd.DataFrame.as_matrix(CC)
+	CC   = pd.read_csv(corr_file, header=None, sep=r"\s+")
+	corr = pd.DataFrame.as_matrix(CC)
 
-		DD   = pd.read_csv(dens_file, header=None, sep=r"\s+")
-		dens = pd.DataFrame.as_matrix(DD)
+	DD   = pd.read_csv(dens_file, header=None, sep=r"\s+")
+	dens = pd.DataFrame.as_matrix(DD)
 
 
-		Lint = int(np.amax(dens[:,1]))+1
+	Lint = int(np.amax(dens[:,1]))+1
 
-		lt_corr = int(np.shape(corr)[0]/(Lint*Lint))
-		lt_dens = int(np.shape(dens)[0]/(Lint))
-		
-		corr_tab  = np.reshape(corr[:,2],(lt_corr,Lint,Lint))
-		dens_tab  = np.reshape(dens[:,2],(lt_dens,Lint))
+	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))
+	lt_dens = int(np.shape(dens)[0]/(Lint))
+	
+	corr_tab  = np.reshape(corr[:,2],(lt_corr,Lint,Lint))
+	dens_tab  = np.reshape(dens[:,2],(lt_dens,Lint))
 
-		t_max = int(np.amin([lt_corr,lt_dens]))
+	t_max = int(np.amin([lt_corr,lt_dens]))
 
-		corr_aver = np.zeros((t_max,Lint+1))
+	corr_aver = np.zeros((t_max,Lint+1))
 
-		for x in range(0,t_max):
-			dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
-			data_tab0 = corr_tab[x]-dens_dens
-			data_tab  = Trasl_Mean(data_tab0)
+	for x in range(0,t_max):
+		dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
+		data_tab0 = corr_tab[x]-dens_dens
+		data_tab  = Trasl_Mean(data_tab0)
 
-			corr_aver[x] = np.append(data_tab,data_tab[0])
+		corr_aver[x] = np.append(data_tab,data_tab[0])
 
-		print(corrcon_file)
+	print(corrcon_file)
 
-		namefold = '/L_'+L+'/D_'+D+'/corr_con'
-		dirdat   = os.path.abspath(glob.glob('../datas')[0])
-		
-		namegen  = generate_filename(dirdat+os.sep+namefold)
+	namefold = '/L_'+L+'/D_'+D+'/corr_con'
+	dirdat   = os.path.abspath(glob.glob('../datas')[0])
+	
+	namegen  = generate_filename(dirdat+os.sep+namefold)
 
-		np.savetxt(namegen, corr_aver, fmt='%.9f')
+	np.savetxt(namegen, corr_aver, fmt='%.9f')
 
 	return 1
 
@@ -83,7 +86,8 @@ def Trasl_Mean(A):
 	return np.mean(B, axis=0)
 
 #....................................................creation of folder
-def	folder_crea(directory):
+def	folder_crea():
+	directory = sorted(glob.glob('../DATI*/*/*/'))
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
 	for dir_name in directory:

@@ -13,14 +13,11 @@ LOCAL = os.path.abspath('.')
 
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
-directory = sorted(glob.glob('../DATI*/*/*/'))
-namesLD = ff.folder_crea(directory)
 
-t_max  = 10002
+namesLD = ff.folder_crea()
 
 dir_nameALL = '../**/corr.prp'
 All_files   = glob.glob(dir_nameALL, recursive=True)
-
 
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
