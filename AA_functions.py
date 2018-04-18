@@ -86,8 +86,7 @@ def Trasl_Mean(A):
 	return np.mean(B, axis=0)
 
 #....................................................creation of folder
-def	folder_crea():
-	directory = sorted(glob.glob('../DATI*/*/*/'))
+def	folder_crea(directory):	
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
 	for dir_name in directory:

@@ -14,7 +14,8 @@ LOCAL = os.path.abspath('.')
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
 
-namesLD = ff.folder_crea()
+directory = sorted(glob.glob('../DATI*/*/*/'))	
+namesLD = ff.folder_crea(directory)
 
 dir_nameALL = '../**/corr.prp'
 All_files   = glob.glob(dir_nameALL, recursive=True)
