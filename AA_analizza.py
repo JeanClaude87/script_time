@@ -21,13 +21,13 @@ namesLD = ff.folder_crea(LOCAL,directory)
 
 t_max=10002
 
-#comm = MPI.COMM_WORLD
-#size = comm.Get_size()
-#rank = comm.Get_rank()
+comm = MPI.COMM_WORLD
+size = comm.Get_size()
+rank = comm.Get_rank()
 
 
 for kk,name in enumerate(namesLD):
-#	if kk%size!=rank: continue
+	if kk%size!=rank: continue
 	
 	L = name[0]
 	D = name[1]
