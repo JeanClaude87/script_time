@@ -18,7 +18,7 @@ import shutil
 
 
 #.............................................Export connected function
-def	CorCon_exp(LOCAL,filename):
+def	CorCon_exp(Lint,LOCAL,filename):
 
 	
 	str_spl_tmp = re.split('L',filename)
@@ -39,7 +39,7 @@ def	CorCon_exp(LOCAL,filename):
 	dens = pd.DataFrame.as_matrix(DD)
 
 
-	Lint = int(np.amax(dens[:,1]))+1
+	#Lint = int(np.amax(dens[:,1]))+1
 
 	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))
 	lt_dens = int(np.shape(dens)[0]/(Lint))
@@ -81,15 +81,17 @@ def Trasl_Mean(A):
 
 
 #......................................................put nan
-def putnan(t,A):
+def putnan(Space,t,A):
 	Time  = A.shape[0]
-	Space = A.shape[1]
 	nantime = t-Time
 
 #	print(Space, 'putnan')
 
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
+
+	print(A.shape,B.shape)
+
 
 	xx = np.concatenate((A,B), axis=0)
 	return xx

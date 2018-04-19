@@ -32,14 +32,14 @@ for kk,name in enumerate(namesLD):
 	L = name[0]
 	D = name[1]
 
-	L_int = int(L)+1
+	L_int = int(L)
 
 	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
 	All_files = glob.glob(dir_nameALL, recursive=True)
 	
 	n_rel=len(All_files)
 
-	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
+	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
 #	print(L_int, 'lung')
 
 	i=0
@@ -54,9 +54,9 @@ for kk,name in enumerate(namesLD):
 			corr_conn = pd.DataFrame.as_matrix(DD)
 
 		else:
-			corr_conn = ff.CorCon_exp(LOCAL,filename)
+			corr_conn = ff.CorCon_exp(L_int,LOCAL,filename)
 
-		corr_conn_nan = ff.putnan(t_max,corr_conn)
+		corr_conn_nan = ff.putnan(L_int+1,t_max,corr_conn)
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
