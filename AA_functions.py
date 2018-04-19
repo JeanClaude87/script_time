@@ -54,9 +54,9 @@ def	CorCon_exp(Lint,LOCAL,filename):
 		dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
 		data_tab0 = corr_tab[x]-dens_dens
 		data_tab  = Trasl_Mean(data_tab0)
-
-		corr_aver[x] = np.append(data_tab,data_tab[0])
-
+		plus_last_el = np.append(data_tab,data_tab[0])
+		corr_aver[x] = plus_last_el
+		print(plus_last_el.shape)
 
 	namefold = '/L_'+L+'/D_'+D+'/corr_con'
 	dat_fold = LOCAL+'/datas'
