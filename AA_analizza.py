@@ -60,6 +60,8 @@ for kk,name in enumerate(namesLD):
 
 		corr_conn_nan = ff.putnan(L_int+1,t_max,corr_conn)
 
+		print(corr_conn.shape)
+
 		Big_Mat[i] = corr_conn_nan
 		i+=1
 
