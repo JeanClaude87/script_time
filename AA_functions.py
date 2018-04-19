@@ -15,7 +15,60 @@ import fnmatch
 import pandas as pd
 import shutil
 
+#.............................................Export connected function
+def	Io_fascio_tuto(name):
 
+	L = name[0]
+	D = name[1]
+
+	L_int = int(L)
+
+	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
+	All_files = glob.glob(dir_nameALL, recursive=True)
+	
+	n_rel=len(All_files)
+
+	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
+	#print(L_int, 'lung')
+
+	i=0
+
+	for filename in All_files:
+
+		dir_path  = os.path.dirname(filename)
+		corrcon_file = dir_path+'/corr_con.prp'
+		print(corrcon_file, (i+1), '/', n_rel)
+
+	#	print(filename,L_int)
+
+		if os.path.isfile(corrcon_file) :
+			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
+			corr_conn = pd.DataFrame.as_matrix(DD)
+
+		else:
+			corr_conn = ff.CorCon_exp(L_int,LOCAL,filename)
+
+		corr_conn_nan = ff.putnan(L_int+1,t_max,corr_conn)
+
+	#	print(corr_conn.shape)
+
+		Big_Mat[i] = corr_conn_nan
+		i+=1
+
+
+	dirAV_path = LOCAL+'/average/L_'+L+'/D_'+D
+	
+	media_0 = np.nanmean(Big_Mat,axis=0)
+	media   = np.hstack((media_0,np.array([media_0[:,0]]).T))
+	np.savetxt(dirAV_path+'/corr_aver.prp', media, fmt='%.9f')
+
+	std_0   = np.nanstd(Big_Mat,axis=0)
+	std     = np.hstack((std_0,np.array([std_0[:,0]]).T))
+	np.savetxt(dirAV_path+'/corr_std.prp', std, fmt='%.9f')
+
+	print(L, D, n_rel, "FATTO")	
+
+	return 1
 
 #.............................................Export connected function
 def	CorCon_exp(Lint,LOCAL,filename):
