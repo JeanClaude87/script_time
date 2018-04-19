@@ -94,9 +94,9 @@ def	CorCon_exp(Lint,LOCAL,filename):
 
 	#Lint = int(np.amax(dens[:,1]))+1
 
-	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))-1
-	lt_dens = int(np.shape(dens)[0]/(Lint))-1
-	t_max = int(np.amin([lt_corr,lt_dens]))
+	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))-2
+	lt_dens = int(np.shape(dens)[0]/(Lint))-2
+	t_max = int(np.amin([lt_corr,lt_dens]))-1
 	
 	corr_tab  = np.reshape(corr[:t_max*Lint*Lint,2],(lt_corr,Lint,Lint))
 	dens_tab  = np.reshape(dens[:t_max*Lint     ,2],(lt_dens,Lint))
