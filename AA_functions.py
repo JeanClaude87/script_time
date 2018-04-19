@@ -83,6 +83,7 @@ def Trasl_Mean(A):
 #......................................................put nan
 def putnan(Space,t,A):
 	Time  = A.shape[0]
+	Space = A.shape[1]	
 	nantime = t-Time
 
 #	print(Space, 'putnan')
