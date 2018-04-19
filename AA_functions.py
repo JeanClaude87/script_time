@@ -154,6 +154,8 @@ def	folder_crea(LOCAL,directory):
 	dat_fold = LOCAL+'/datas'
 	ave_fold = LOCAL+'/average'
 
+	print(dat_fold, ave_fold)
+
 	if os.path.exists(dat_fold):
 		shutil.rmtree(dat_fold, ignore_errors=True)
 
