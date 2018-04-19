@@ -99,11 +99,13 @@ def	folder_crea(LOCAL,directory):
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
 	dat_fold = LOCAL+'/datas'
-	if os.path.exists(dat_fold):
-		shutil.rmtree(dat_fold, ignore_errors=True)
 	ave_fold = LOCAL+'/average'
+
+	if os.path.exists(dat_fold):
+#		shutil.rmtree(dat_fold, ignore_errors=True)
+
 	if os.path.exists(ave_fold):
-		shutil.rmtree(ave_fold, ignore_errors=True)
+#		shutil.rmtree(ave_fold, ignore_errors=True)
 
 	for dir_name in directory:
 
