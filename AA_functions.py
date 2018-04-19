@@ -13,6 +13,8 @@ from numpy import inf
 import re
 import fnmatch
 import pandas as pd
+import shutil
+
 
 
 #.............................................Export connected function
@@ -31,12 +33,6 @@ def	CorCon_exp(filename):
 	corrcon_file = dir_path+'/corr_con.prp'
 
 	print(corrcon_file)
-
-	#if os.path.isfile(corrcon_file) :
-	#	ciao=0
-	#	print(corrcon_file, "FATTO")
-	
-	#else:
 
 	CC   = pd.read_csv(corr_file, header=None, sep=r"\s+")
 	corr = pd.DataFrame.as_matrix(CC)
@@ -72,9 +68,9 @@ def	CorCon_exp(filename):
 	namegen  = generate_filename(dirdat+os.sep+namefold)
 
 	np.savetxt(namegen, corr_aver, fmt='%.9f')
+	np.savetxt(corrcon_file, corr_aver, fmt='%.9f')
 
-	return 1
-
+	return corr_aver
 
 
 #......................................................Traslations MEAN
@@ -85,10 +81,31 @@ def Trasl_Mean(A):
 		B[i] = np.roll(A[i],-i)
 	return np.mean(B, axis=0)
 
+
+#......................................................put nan
+def putnan(t,A):
+	Time  = A.shape[0]
+	Space = A.shape[1]
+	nantime = t-Time
+
+	print(A.shape)
+
+	B = np.empty((nantime,Space,))
+	B[:] = np.nan
+
+	xx = np.concatenate((A,B), axis=0)
+	return xx
+
 #....................................................creation of folder
 def	folder_crea(directory):	
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
+	
+	if os.path.exists('../datas'):
+		shutil.rmtree('../datas', ignore_errors=True)
+	if os.path.exists('../average'):
+		shutil.rmtree('../average', ignore_errors=True)
+
 	for dir_name in directory:
 
 		str_spl = re.split('/|_',dir_name)
