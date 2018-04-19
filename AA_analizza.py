@@ -10,7 +10,6 @@ import AA_functions as ff
 
 
 LOCAL = os.path.abspath('../')
-
 t_max=10002
 
 comm = MPI.COMM_WORLD

@@ -102,10 +102,10 @@ def	folder_crea(LOCAL,directory):
 	ave_fold = LOCAL+'/average'
 
 	if os.path.exists(dat_fold):
-#		shutil.rmtree(dat_fold, ignore_errors=True)
+		shutil.rmtree(dat_fold, ignore_errors=True)
 
 	if os.path.exists(ave_fold):
-#		shutil.rmtree(ave_fold, ignore_errors=True)
+		shutil.rmtree(ave_fold, ignore_errors=True)
 
 	for dir_name in directory:
 
