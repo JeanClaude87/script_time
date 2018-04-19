@@ -49,7 +49,7 @@ for kk,name in enumerate(namesLD):
 		dir_path  = os.path.dirname(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
 
-		print(filename,Lint)
+		print(filename,L_int)
 
 		if os.path.isfile(corrcon_file) :
 			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
