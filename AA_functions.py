@@ -40,8 +40,8 @@ def	CorCon_exp(Lint,LOCAL,filename):
 
 	#Lint = int(np.amax(dens[:,1]))+1
 
-	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))
-	lt_dens = int(np.shape(dens)[0]/(Lint))
+	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))-1
+	lt_dens = int(np.shape(dens)[0]/(Lint))-1
 	
 	corr_tab  = np.reshape(corr[:,2],(lt_corr,Lint,Lint))
 	dens_tab  = np.reshape(dens[:,2],(lt_dens,Lint))
@@ -65,7 +65,7 @@ def	CorCon_exp(Lint,LOCAL,filename):
 
 	np.savetxt(namegen, corr_aver, fmt='%.9f')
 	np.savetxt(corrcon_file, corr_aver, fmt='%.9f')
-
+	print('bella YO')
 	return corr_aver
 
 
