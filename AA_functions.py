@@ -58,6 +58,7 @@ def	CorCon_exp(LOCAL,filename):
 
 		corr_aver[x] = np.append(data_tab,data_tab[0])
 
+
 	namefold = '/L_'+L+'/D_'+D+'/corr_con'
 	dat_fold = LOCAL+'/datas'
 	dirdat   = os.path.abspath(glob.glob(dat_fold)[0])
