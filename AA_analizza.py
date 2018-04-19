@@ -23,9 +23,10 @@ if rank == 0:
 	directory = sorted(glob.glob(path_file))	
 	namesLD = ff.folder_crea(LOCAL,directory)
 
+print(namesLD)
 
-namesLD = comm.scatter(namesLD, root=0)
-print ('rank',rank,'has data:',namesLD)
+#namesLD = comm.scatter(namesLD, root=0)
+#print ('rank',rank,'has data:',namesLD)
 
 
 
