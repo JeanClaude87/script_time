@@ -16,11 +16,12 @@ import pandas as pd
 import shutil
 
 #.............................................Export connected function
-def	Io_fascio_tuto(name):
+def	Io_fascio_tuto(name,LOCAL):
 
 	L = name[0]
 	D = name[1]
 
+	t_max=10002
 	L_int = int(L)
 
 	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
@@ -46,9 +47,9 @@ def	Io_fascio_tuto(name):
 			corr_conn = pd.DataFrame.as_matrix(DD)
 
 		else:
-			corr_conn = ff.CorCon_exp(L_int,LOCAL,filename)
+			corr_conn = CorCon_exp(L_int,LOCAL,filename)
 
-		corr_conn_nan = ff.putnan(L_int+1,t_max,corr_conn)
+		corr_conn_nan = putnan(L_int+1,t_max,corr_conn)
 
 	#	print(corr_conn.shape)
 

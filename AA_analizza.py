@@ -10,7 +10,6 @@ import AA_functions as ff
 
 
 LOCAL = os.path.abspath('../')
-t_max=10002
 
 #comm = MPI.COMM_WORLD
 #size = comm.Get_size()
@@ -29,7 +28,7 @@ namesLD = ff.folder_crea(LOCAL,directory)
 for kk,name in enumerate(namesLD):
 #	if kk%size!=rank: continue
 	
-	ff.Io_fascio_tuto(name)
+	ff.Io_fascio_tuto(name,LOCAL)
 
 
 
