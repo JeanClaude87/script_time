@@ -1,4 +1,4 @@
-#from mpi4py import MPI
+from mpi4py import MPI
 import numpy as np
 import glob
 import pandas as pd
