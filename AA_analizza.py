@@ -40,7 +40,7 @@ for kk,name in enumerate(namesLD):
 	n_rel=len(All_files)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
-	print(L_int, 'lung')
+#	print(L_int, 'lung')
 
 	i=0
 
@@ -60,6 +60,8 @@ for kk,name in enumerate(namesLD):
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
+
+		print(corrcon_file)
 
 	dirAV_path = LOCAL+'/average/L_'+L+'/D_'+D
 	

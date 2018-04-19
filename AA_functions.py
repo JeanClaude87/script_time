@@ -86,7 +86,7 @@ def putnan(t,A):
 	Space = A.shape[1]
 	nantime = t-Time
 
-	print(Space, 'putnan')
+#	print(Space, 'putnan')
 
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
