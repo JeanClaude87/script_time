@@ -37,7 +37,6 @@ for kk,name in enumerate(namesLD):
 	All_files = glob.glob(dir_nameALL, recursive=True)
 	
 	n_rel=len(All_files)
-	print(L, D, n_rel)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
 
@@ -51,11 +50,9 @@ for kk,name in enumerate(namesLD):
 		if os.path.isfile(corrcon_file) :
 			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
 			corr_conn = pd.DataFrame.as_matrix(DD)
-			print('letto')
 
 		else:
 			corr_conn = ff.CorCon_exp(filename)
-			print('fatto')
 
 		corr_conn_nan = ff.putnan(t_max,corr_conn)
 

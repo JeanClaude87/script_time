@@ -32,8 +32,6 @@ def	CorCon_exp(filename):
 	dens_file = dir_path+'/dens.prp'
 	corrcon_file = dir_path+'/corr_con.prp'
 
-	print(corrcon_file)
-
 	CC   = pd.read_csv(corr_file, header=None, sep=r"\s+")
 	corr = pd.DataFrame.as_matrix(CC)
 
@@ -60,8 +58,6 @@ def	CorCon_exp(filename):
 
 		corr_aver[x] = np.append(data_tab,data_tab[0])
 
-	print(corrcon_file)
-
 	namefold = '/L_'+L+'/D_'+D+'/corr_con'
 	dirdat   = os.path.abspath(glob.glob('../datas')[0])
 	
@@ -87,8 +83,6 @@ def putnan(t,A):
 	Time  = A.shape[0]
 	Space = A.shape[1]
 	nantime = t-Time
-
-	print(A.shape)
 
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
