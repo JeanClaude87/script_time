@@ -36,7 +36,7 @@ print(namesLD)
 	#ff.Io_fascio_tuto(name,LOCAL)
 #	uga = 1
 
-print('YO', name)
+#print('YO', name)
 
 
 
