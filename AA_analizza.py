@@ -41,7 +41,7 @@ for kk,name in enumerate(namesLD):
 	n_rel=len(All_files)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
-	print(L_int)
+	print(L_int, 'lung')
 
 	i=0
 
