@@ -85,10 +85,14 @@ def putnan(Space,t,A):
 	Time  = A.shape[0]
 	nantime = t-Time
 
+#	print(Space, 'putnan')
+
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
 
-	xx = np.concatenate((A,B), axis=0)
+	print(A.shape,B.shape)
+
+#	xx = np.concatenate((A,B), axis=0)
 	return xx
 
 #....................................................creation of folder
