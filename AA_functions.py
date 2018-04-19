@@ -93,7 +93,7 @@ def putnan(Space,t,A):
 
 	print(A.shape,B.shape)
 
-#	xx = np.concatenate((A,B), axis=0)
+	xx = np.concatenate((A,B), axis=0)
 	return xx
 
 #....................................................creation of folder

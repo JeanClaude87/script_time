@@ -33,7 +33,6 @@ for kk,name in enumerate(namesLD):
 	D = name[1]
 
 	L_int = int(L)
-	print(L_int)
 
 	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
 	All_files = glob.glob(dir_nameALL, recursive=True)
