@@ -45,6 +45,7 @@ for kk,name in enumerate(namesLD):
 	i=0
 
 	for filename in All_files:
+		print(corrcon_file, (i+1), '/', n_rel)
 
 		dir_path  = os.path.dirname(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
@@ -64,7 +65,7 @@ for kk,name in enumerate(namesLD):
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
-		print(corrcon_file, i, '/', n_rel)
+
 
 	dirAV_path = LOCAL+'/average/L_'+L+'/D_'+D
 	
