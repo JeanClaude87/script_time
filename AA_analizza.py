@@ -20,11 +20,11 @@ directory = sorted(glob.glob(path_file))
 namesLD = ff.folder_crea(LOCAL,directory)
 
 
+t_max=10002
+
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
 rank = comm.Get_rank()
-
-t_max=10002
 
 
 for kk,name in enumerate(namesLD):
@@ -41,6 +41,7 @@ for kk,name in enumerate(namesLD):
 	n_rel=len(All_files)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
+	print(L_int)
 
 	i=0
 
