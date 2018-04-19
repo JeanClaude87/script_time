@@ -89,7 +89,7 @@ def putnan(Space,t,A):
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
 
-	print(A.shape,B.shape)
+#	print(A.shape,B.shape)
 
 	xx = np.concatenate((A,B), axis=0)
 	return xx

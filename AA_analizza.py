@@ -40,7 +40,7 @@ for kk,name in enumerate(namesLD):
 	n_rel=len(All_files)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
-	print(L_int, 'lung')
+	#print(L_int, 'lung')
 
 	i=0
 
@@ -49,7 +49,7 @@ for kk,name in enumerate(namesLD):
 		dir_path  = os.path.dirname(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
 
-		print(filename,L_int)
+	#	print(filename,L_int)
 
 		if os.path.isfile(corrcon_file) :
 			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
@@ -60,7 +60,7 @@ for kk,name in enumerate(namesLD):
 
 		corr_conn_nan = ff.putnan(L_int+1,t_max,corr_conn)
 
-		print(corr_conn.shape)
+	#	print(corr_conn.shape)
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
