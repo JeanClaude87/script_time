@@ -25,7 +25,7 @@ if rank == 0:
 
 
 namesLD = comm.scatter(data, root=0)
-print ('rank',rank,'has data:',data)
+print ('rank',rank,'has data:',namesLD)
 
 
 
