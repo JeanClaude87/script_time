@@ -19,7 +19,7 @@ import shutil
 
 #.............................................Export connected function
 def	CorCon_exp(Lint,LOCAL,filename):
-
+	print(filename,Lint)
 	
 	str_spl_tmp = re.split('L',filename)
 	str_spl     = re.split('_|/',str_spl_tmp[1])
