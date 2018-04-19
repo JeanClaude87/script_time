@@ -39,7 +39,6 @@ for kk,name in enumerate(namesLD):
 	
 	n_rel=len(All_files)
 
-	'''
 	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
 	print(L_int, 'lung')
 
@@ -65,8 +64,7 @@ for kk,name in enumerate(namesLD):
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
-
-		print(corrcon_file)
+		print(corrcon_file, i, '/', n_rel)
 
 	dirAV_path = LOCAL+'/average/L_'+L+'/D_'+D
 	
@@ -77,7 +75,7 @@ for kk,name in enumerate(namesLD):
 	std_0   = np.nanstd(Big_Mat,axis=0)
 	std     = np.hstack((std_0,np.array([std_0[:,0]]).T))
 	np.savetxt(dirAV_path+'/corr_std.prp', std, fmt='%.9f')
-	'''
+
 	print(L, D, n_rel, "FATTO")
 
 
