@@ -24,7 +24,7 @@ if rank == 0:
 	namesLD = ff.folder_crea(LOCAL,directory)
 
 
-namesLD = comm.scatter(data, root=0)
+namesLD = comm.scatter(namesLD, root=0)
 print ('rank',rank,'has data:',namesLD)
 
 
