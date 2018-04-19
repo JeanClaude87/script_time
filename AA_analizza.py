@@ -9,13 +9,15 @@ import re
 import AA_functions as ff
 
 
-LOCAL = os.path.abspath('.')
+LOCAL = os.path.abspath('../')
+print(LOCAL)
 
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
 
-directory = sorted(glob.glob('../DATI*/*/*/'))	
-namesLD = ff.folder_crea(directory)
+path_file = LOCAL+'/DATI*/*/*/'
+directory = sorted(glob.glob(path_file))	
+namesLD = ff.folder_crea(LOCAL,directory)
 
 
 comm = MPI.COMM_WORLD
@@ -33,7 +35,7 @@ for kk,name in enumerate(namesLD):
 
 	L_int = int(L)+1
 
-	dir_nameALL = '../**/L_'+L+'/D_'+D+'/*/corr.prp'
+	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
 	All_files = glob.glob(dir_nameALL, recursive=True)
 	
 	n_rel=len(All_files)
@@ -52,14 +54,14 @@ for kk,name in enumerate(namesLD):
 			corr_conn = pd.DataFrame.as_matrix(DD)
 
 		else:
-			corr_conn = ff.CorCon_exp(filename)
+			corr_conn = ff.CorCon_exp(LOCAL,filename)
 
 		corr_conn_nan = ff.putnan(t_max,corr_conn)
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
 
-	dirAV_path = '../average/L_'+L+'/D_'+D
+	dirAV_path = LOCAL+'/average/L_'+L+'/D_'+D
 	
 	media_0 = np.nanmean(Big_Mat,axis=0)
 	media   = np.hstack((media_0,np.array([media_0[:,0]]).T))

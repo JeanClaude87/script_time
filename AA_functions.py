@@ -18,7 +18,7 @@ import shutil
 
 
 #.............................................Export connected function
-def	CorCon_exp(filename):
+def	CorCon_exp(LOCAL,filename):
 
 	
 	str_spl_tmp = re.split('L',filename)
@@ -59,7 +59,8 @@ def	CorCon_exp(filename):
 		corr_aver[x] = np.append(data_tab,data_tab[0])
 
 	namefold = '/L_'+L+'/D_'+D+'/corr_con'
-	dirdat   = os.path.abspath(glob.glob('../datas')[0])
+	dat_fold = LOCAL+'/datas'
+	dirdat   = os.path.abspath(glob.glob(dat_fold)[0])
 	
 	namegen  = generate_filename(dirdat+os.sep+namefold)
 
@@ -91,14 +92,15 @@ def putnan(t,A):
 	return xx
 
 #....................................................creation of folder
-def	folder_crea(directory):	
+def	folder_crea(LOCAL,directory):	
 	names = [[0 for x in range(2)] for y in range(len(directory))]
 	j=0
-	
-	if os.path.exists('../datas'):
-		shutil.rmtree('../datas', ignore_errors=True)
-	if os.path.exists('../average'):
-		shutil.rmtree('../average', ignore_errors=True)
+	dat_fold = LOCAL+'/datas'
+	if os.path.exists(dat_fold):
+		shutil.rmtree(dat_fold, ignore_errors=True)
+	ave_fold = LOCAL+'/average'
+	if os.path.exists(ave_fold):
+		shutil.rmtree(ave_fold, ignore_errors=True)
 
 	for dir_name in directory:
 
@@ -108,12 +110,12 @@ def	folder_crea(directory):
 
 		names[j][0] = L
 		names[j][1] = D
-		dirDT_path = '../datas/L_'+L+'/D_'+D
+		dirDT_path = dat_fold+'/L_'+L+'/D_'+D
 
 		if not os.path.exists(dirDT_path):
 			os.makedirs(dirDT_path)
 
-		dirAV_path = '../average/L_'+L+'/D_'+D
+		dirAV_path = ave_fold+'/L_'+L+'/D_'+D
 
 		if not os.path.exists(dirAV_path):
 			os.makedirs(dirAV_path)
