@@ -1,4 +1,4 @@
-from mpi4py import MPI
+#from mpi4py import MPI
 import numpy as np
 import glob
 import pandas as pd
@@ -12,22 +12,22 @@ import AA_functions as ff
 LOCAL = os.path.abspath('../')
 t_max=10002
 
-comm = MPI.COMM_WORLD
-size = comm.Get_size()
-rank = comm.Get_rank()
+#comm = MPI.COMM_WORLD
+#size = comm.Get_size()
+#rank = comm.Get_rank()
 
 
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
 
-if rank == 0:
+#if rank == 0:
 
-	path_file = LOCAL+'/DATI*/*/*/'
-	directory = sorted(glob.glob(path_file))	
-	namesLD = ff.folder_crea(LOCAL,directory)
+path_file = LOCAL+'/DATI*/*/*/'
+directory = sorted(glob.glob(path_file))	
+namesLD = ff.folder_crea(LOCAL,directory)
 
 for kk,name in enumerate(namesLD):
-	if kk%size!=rank: continue
+#	if kk%size!=rank: continue
 	
 	L = name[0]
 	D = name[1]
