@@ -7,22 +7,23 @@ from math import factorial
 from datetime import datetime
 import time
 import re
-import os as os
+import os
 import glob
 from numpy import inf
-import re
 import fnmatch
 import pandas as pd
 import shutil
+#from joblib import Parallel, delayed
 
 #.............................................Export connected function
 def	Io_fascio_tuto(name,LOCAL):
 
-	L = name[0]
-	D = name[1]
+	L,D = name
 
 	t_max=10002
 	L_int = int(L)
+
+	print("L", L)
 
 	dir_nameALL = LOCAL+'/**/L_'+L+'/D_'+D+'/*/corr.prp'
 	All_files = glob.glob(dir_nameALL, recursive=True)
@@ -45,9 +46,11 @@ def	Io_fascio_tuto(name,LOCAL):
 		if os.path.isfile(corrcon_file) :
 			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
 			corr_conn = pd.DataFrame.as_matrix(DD)
+			print("LETTO")
 
 		else:
-			corr_conn = CorCon_exp(L_int,LOCAL,filename)
+			corr_conn = CorCon_exp(LOCAL,filename)
+			print("FATTO")
 
 		corr_conn_nan = putnan(L_int+1,t_max,corr_conn)
 
@@ -72,7 +75,7 @@ def	Io_fascio_tuto(name,LOCAL):
 	return 1
 
 #.............................................Export connected function
-def	CorCon_exp(Lint,LOCAL,filename):
+def	CorCon_exp(LOCAL,filename):
 	
 	str_spl_tmp = re.split('L',filename)
 	str_spl     = re.split('_|/',str_spl_tmp[1])
@@ -91,15 +94,17 @@ def	CorCon_exp(Lint,LOCAL,filename):
 	DD   = pd.read_csv(dens_file, header=None, sep=r"\s+")
 	dens = pd.DataFrame.as_matrix(DD)
 
-
-	#Lint = int(np.amax(dens[:,1]))+1
+	Lint = int(np.amax(dens[:,1]))+1
 
 	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))-2
 	lt_dens = int(np.shape(dens)[0]/(Lint))-2
-	t_max = int(np.amin([lt_corr,lt_dens]))-1
+	t_max   = int(np.amin([lt_corr,lt_dens]))-1
 	
-	corr_tab  = np.reshape(corr[:t_max*Lint*Lint,2],(lt_corr,Lint,Lint))
-	dens_tab  = np.reshape(dens[:t_max*Lint     ,2],(lt_dens,Lint))
+	print("L", Lint, lt_corr, lt_dens, t_max)
+	print("dim", t_max*Lint*Lint, t_max*Lint)
+
+	corr_tab  = np.reshape(corr[:lt_corr*Lint*Lint,2],(lt_corr,Lint,Lint))
+	dens_tab  = np.reshape(dens[:lt_dens*Lint     ,2],(lt_dens,Lint))
 
 	corr_aver = np.zeros((t_max,Lint+1))
 
@@ -118,7 +123,6 @@ def	CorCon_exp(Lint,LOCAL,filename):
 
 	np.savetxt(namegen, corr_aver, fmt='%.9f')
 	np.savetxt(corrcon_file, corr_aver, fmt='%.9f')
-	print('bella YO')
 	return corr_aver
 
 
@@ -137,12 +141,8 @@ def putnan(Space,t,A):
 	Space = A.shape[1]	
 	nantime = t-Time
 
-#	print(Space, 'putnan')
-
 	B = np.empty((nantime,Space,))
 	B[:] = np.nan
-
-#	print(A.shape,B.shape)
 
 	xx = np.concatenate((A,B), axis=0)
 	return xx
@@ -155,6 +155,10 @@ def	folder_crea(LOCAL,directory):
 	ave_fold = LOCAL+'/average'
 
 	print(dat_fold, ave_fold)
+
+# from contextlib import suppress
+# with(suppress(OSError)) 
+# os.path.join(LOCAL, "datas")
 
 	if os.path.exists(dat_fold):
 		shutil.rmtree(dat_fold, ignore_errors=True)
@@ -179,7 +183,6 @@ def	folder_crea(LOCAL,directory):
 
 		if not os.path.exists(dirAV_path):
 			os.makedirs(dirAV_path)
-
 
 		j+=1
 
