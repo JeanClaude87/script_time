@@ -18,7 +18,6 @@ path_file = LOCAL+'/DATI*/*/*/'
 directory = sorted(glob.glob(path_file))	
 namesLD = ff.folder_crea(LOCAL,directory)
 
-
 for kk,name in enumerate(namesLD):
 	
 	ff.Io_fascio_tuto(name,LOCAL)

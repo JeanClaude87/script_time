@@ -31,7 +31,6 @@ def	Io_fascio_tuto(name,LOCAL):
 	n_rel=len(All_files)
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
-	#print(L_int, 'lung')
 
 	i=0
 
@@ -40,8 +39,6 @@ def	Io_fascio_tuto(name,LOCAL):
 		dir_path  = os.path.dirname(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
 		print(corrcon_file, (i+1), '/', n_rel)
-
-	#	print(filename,L_int)
 
 		if os.path.isfile(corrcon_file) :
 			DD 		  = pd.read_csv(corrcon_file, header=None, sep=r"\s+")
@@ -53,8 +50,6 @@ def	Io_fascio_tuto(name,LOCAL):
 			print("FATTO")
 
 		corr_conn_nan = putnan(L_int+1,t_max,corr_conn)
-
-	#	print(corr_conn.shape)
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
