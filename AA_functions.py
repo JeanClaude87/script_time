@@ -59,10 +59,12 @@ def	Io_fascio_tuto(name,LOCAL):
 	
 	media_0 = np.nanmean(Big_Mat,axis=0)
 	media   = np.hstack((media_0,np.array([media_0[:,0]]).T))
+	media   = media[~np.isnan(media).any(axis=1)]
 	np.savetxt(dirAV_path+'/corr_aver.prp', media, fmt='%.9f')
 
 	std_0   = np.nanstd(Big_Mat,axis=0)
 	std     = np.hstack((std_0,np.array([std_0[:,0]]).T))
+	std     = std[~np.isnan(std).any(axis=1)]
 	np.savetxt(dirAV_path+'/corr_std.prp', std, fmt='%.9f')
 
 	print(L, D, n_rel, "FATTO")	
