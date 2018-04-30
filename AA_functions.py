@@ -30,7 +30,7 @@ def	Io_fascio_tuto(name,LOCAL):
 	
 	n_rel=len(All_files)
 
-	Big_Mat = np.zeros((n_rel,t_max,L_int+1), dtype=np.float)
+	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
 
 	i=0
 
@@ -49,7 +49,7 @@ def	Io_fascio_tuto(name,LOCAL):
 			corr_conn = CorCon_exp(LOCAL,filename)
 			print("FATTO")
 
-		corr_conn_nan = putnan(L_int+1,t_max,corr_conn)
+		corr_conn_nan = putnan(L_int,t_max,corr_conn)
 
 		Big_Mat[i] = corr_conn_nan
 		i+=1
@@ -89,7 +89,11 @@ def	CorCon_exp(LOCAL,filename):
 	DD   = pd.read_csv(dens_file, header=None, sep=r"\s+")
 	dens = pd.DataFrame.as_matrix(DD)
 
+#...prende il massimo della colonna e ci mette +1 -> GIUSTO
+
 	Lint = int(np.amax(dens[:,1]))+1
+
+#...calcolo giuste dimensioni reshaping
 
 	lt_corr = int(np.shape(corr)[0]/(Lint*Lint))-2
 	lt_dens = int(np.shape(dens)[0]/(Lint))-2
@@ -101,14 +105,12 @@ def	CorCon_exp(LOCAL,filename):
 	corr_tab  = np.reshape(corr[:lt_corr*Lint*Lint,2],(lt_corr,Lint,Lint))
 	dens_tab  = np.reshape(dens[:lt_dens*Lint     ,2],(lt_dens,Lint))
 
-	corr_aver = np.zeros((t_max,Lint+1))
+	corr_aver = np.zeros((t_max,Lint))
 
 	for x in range(0,t_max):
 		dens_dens = np.tensordot(dens_tab[x],dens_tab[x],0)
 		data_tab0 = corr_tab[x]-dens_dens
-		data_tab  = Trasl_Mean(data_tab0)
-		plus_last_el = np.append(data_tab,data_tab[0])
-		corr_aver[x] = plus_last_el
+		corr_aver[x]  = Trasl_Mean(data_tab0)
 
 	namefold = '/L_'+L+'/D_'+D+'/corr_con'
 	dat_fold = LOCAL+'/datas'
