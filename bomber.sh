@@ -2,8 +2,8 @@
 
 CODIR=$(pwd)
 
-rm -f $CODIR/../script_wait.sh
-printf "%s\n" "#!/bin/bash" >> $CODIR/../script_wait.sh
+rm -f $CODIR/script_wait.sh
+printf "%s\n" "#!/bin/bash" >> $CODIR/script_wait.sh
 
 for gamma in $(seq -w 4 2 6)
    do
@@ -76,13 +76,13 @@ for gamma in $(seq -w 4 2 6)
          qsub lancio.sh
          cd $CODIR
 
-         " >> $CODIR/../script_wait.sh
+         " >> $CODIR/script_wait.sh
 
       done
    done
 done
 
 wait
-chmod +x $CODIR/../script_wait.sh
+chmod +x $CODIR/script_wait.sh
 #./script_wait.sh
 
