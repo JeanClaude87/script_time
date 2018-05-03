@@ -23,7 +23,7 @@ for gamma in $(seq -w 4 2 6)
 
          cp $CODIR/lancio.sh $WODIR/lancio.tp
 
-         for x in $(seq 1 1 16)
+         for x in $(seq 1 1 8)
             do
 
             WODIR_core=$WODIR/core_$x
@@ -34,8 +34,8 @@ for gamma in $(seq -w 4 2 6)
 
             cp DMRG_ST/dmrgtev-12.5/dmrgtev $WODIR_core
 
-            IN=L_$gamma-D_$beta-$basetime-core_$uga.inp
-            OUT=L_$gamma-D_$beta-$basetime-core_$uga.out
+            IN=L_$gamma-D_$beta-$basetime-core_$x.inp
+            OUT=L_$gamma-D_$beta-$basetime-core_$x.out
 
             awk -v Beta=$beta -v Gamma=$gamma ' 
             {if (($1=="define") && ($2=="L"))       $3="     " Gamma;       }
@@ -64,9 +64,10 @@ for gamma in $(seq -w 4 2 6)
             nome=L_$gamma-dis_$beta-rel_$alpha
 
             sed -e "s/nomino/$nome/g" < $WODIR/lancio.tp > $WODIR/lancio.sh
-            rm $WODIR/lancio.tp
 
          done
+
+         rm $WODIR/lancio.tp
 
          # scrivi i lancio su script_wait.sh
          ############################################################

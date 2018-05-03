@@ -108,7 +108,7 @@ define  tstep                                           0.25
 trotter         time
                                 time_zips                       10
                                 timestep                        tstep
-                                steps_number                    2 //4001
+                                steps_number                    20 //4001
                                 target  psi                     0
 
 
