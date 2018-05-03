@@ -1,0 +1,171 @@
+define                  L               14
+define                  Np              0
+define                  t               -1.0
+define                  V               2.0
+define                  Delta   4.0
+define                  Delta0  1000.0
+
+define                  iu              sqrt(-1.0)
+define                  pi              2.0*arg(iu)
+
+dmrg_states                             0       0       10  40          0.0000001
+dmrg_timestates         0.0     0       0       10      400             0.00001
+
+
+memory                          80000
+show                                    memory
+zips                                    7
+
+sites                                   L
+
+reflect_blocks                  false
+reflect_universe                true
+halfsweep                               false
+
+//..................................................................SPAZIO      DI      HILBERT
+
+
+
+space   Up                      // | 1 0 >
+                        states                  1
+                        quantum                 Num             0.5
+                        bose
+
+space   Down                    // | 0 1 >
+                        states                  1
+                        quantum                 Num             -0.5
+                        bose
+
+
+//..................................................................OPERATORI
+
+
+action  Sx
+                0.0             0.5
+                0.5             0.0             
+
+action  Sy
+                0.0             0.5*iu
+                -0.5*iu         0.0
+
+action  Sp
+                0.0             0.0
+                1.0             0.0             
+
+action  Sm
+                0.0             1.0
+                0.0             0.0
+                
+action  Sz      
+                0.5             0.0     
+                0.0             -0.5
+                
+                
+show            hamiltonian             4
+
+//..................................................................HAMILTONIANA        STATICA
+
+ham_begin       Sites
+
+                do      i       0       Sites-1 1
+                
+                        term    coeff           t/2*0.000001            
+                                action  Sp      i
+                                action  Sm      i+1
+
+                        term    coeff           t/2*0.000001            
+                                action  Sm      i
+                                action  Sp      i+1
+
+                        term    coeff           V*t                     
+                                action  Sz      i
+                                action  Sz      i+1             
+
+                        term    coeff           Delta0*random1m1(i)     
+                                action  Sz      i
+        
+                done
+
+ham_end
+                                        
+//..................................................................TARGET
+
+                do      len     2       L       2
+
+                        target  psi
+                                sites                           len
+                                states                          1
+                                quantum         Num             Np
+
+                done
+
+
+//..................................................................EVOLUZIONE  TEMPORALE
+
+
+define  tstep                                           0.5
+
+trotter         time
+                                time_zips                       10
+                                timestep                        tstep
+                                steps_number            2001
+                                target  psi                     0
+
+
+//..................................................................HAMILTONIANA DINAMICA
+
+        timeham_begin           Sites
+
+                do      i       0       Sites-1 1
+                
+                        term    coeff           t/2                     
+                                action  Sp      i
+                                action  Sm      i+1
+
+                        term    coeff           t/2                     
+                                action  Sm      i
+                                action  Sp      i+1
+
+                        term    coeff           V*t                     
+                                action  Sz      i
+                                action  Sz      i+1             
+
+                        term    coeff           Delta*random1m1(i)      
+                                action  Sz      i
+        
+                done
+
+
+        timeham_end             
+
+//..................................................................PROP
+
+                        do      i       0       L-1     1
+                property        dens            sites   L
+                        ket psi 0
+                        bra psi 0
+                index   i
+                                term    action  Sz              i
+                        done
+
+                        do      i       0       L-1     1
+                property        dens            sites   L+1
+                        ket psi 0
+                        bra psi 0
+                index   i
+                                term    action  Sz              i
+                        done
+                
+
+                        do      i       0       L-1     1
+                        do      j       0       L-1     1                       
+                property        corr            sites   L+1
+                        ket psi 0
+                        bra psi 0
+                index   i+1000*j
+                                term    action  Sz              i
+                                                action  Sz              j
+                        done
+                        done                    
+
+                end

@@ -1,0 +1,173 @@
+define			L		10
+define			Np		L/2
+define			t		-1.0
+define			V		2.0
+define			Delta	3.0
+define			Delta0	10.0
+
+define			iu		sqrt(-1.0)
+define			pi		2.0*arg(iu)
+
+dmrg_states				0	0	20  100 0.0000001
+dmrg_timestates		0.0	0	0	10	800	0.0000001
+
+
+memory      			80000
+show					memory
+zips					5
+
+
+sites					L
+
+reflect_blocks			false
+reflect_universe		false
+halfsweep				false
+
+//..................................................................SPAZIO	DI	HILBERT
+
+
+space	Zero				//		|0>
+			states			1
+			quantum			Num		0
+			bose
+
+space	Uno					//		|1>
+			states			1
+			quantum			Num		1
+			fermi
+
+
+//..................................................................OPERATORI
+
+action	b
+		0.0		1.0					
+		0.0		0.0
+
+action	bd
+		0.0		0.0			
+		1.0		0.0		
+		
+action	n
+		0.0		0.0		
+		0.0		1.0
+		
+action	id
+		1.0		0.0		
+		0.0		1.0
+
+show		hamiltonian		4
+reflect_universe		true
+
+//..................................................................HAMILTONIANA	STATICA
+
+ham_begin	Sites
+
+		do	i	0	Sites-1	1
+		
+			term	coeff		t*0.000001			
+				action	bd	i
+				action	b	i+1
+
+			term	coeff		t*0.000001			
+				action	bd	i+1
+				action	b	i
+
+		
+		done
+
+		do	i	0	Sites-1	1
+		
+			term	coeff		Delta0*random1m1(i)			
+				action	n	i
+
+		done
+	
+ham_end
+					
+//..................................................................TARGET
+
+		do	len	2	L	2
+
+			target	psi
+				sites				len
+				states				1
+				quantum		Num		Np
+
+		done
+
+
+//..................................................................EVOLUZIONE	TEMPORALE
+
+
+define	tstep 						0.1
+
+trotter		time
+				time_zips 			5
+				timestep			tstep
+				steps_number		10001
+				target	psi			0
+
+
+//..................................................................HAMILTONIANA DINAMICA
+
+	timeham_begin		Sites
+
+		do	i	0	Sites-1	1
+		
+			term	coeff		t			
+				action	bd	i
+				action	b	i+1
+
+			term	coeff		t			
+				action	bd	i+1
+				action	b	i
+
+		
+		done
+
+		do	i	0	Sites-1	1
+		
+			term	coeff		Delta*random1m1(i)		
+				action	n	i
+
+		done
+		
+		do	i	0	Sites-1	1
+		
+			term	coeff		V			
+				action	n	i
+				action	n	i+1
+
+		done
+
+	timeham_end		
+
+//..................................................................PROP
+
+			do	i	0	L-1	1
+		property	dens		sites	L
+			ket psi 0
+			bra psi 0
+		index	i
+				term	action	n		i
+			done
+
+			do	i	0	L-1	1
+		property	dens		sites	L+1
+			ket psi 0
+			bra psi 0
+		index	i
+				term	action	n		i
+			done
+		
+
+			do	i	0	L-1	1
+		property	corr		sites	L+1
+			ket psi 0
+			bra psi 0
+		index	i
+				term	action	n		0
+						action	n		i
+			done
+
+		end
