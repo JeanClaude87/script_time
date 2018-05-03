@@ -4,7 +4,7 @@ rm -f ../script_wait.sh
 printf "%s\n" "#!/bin/bash" >> ../script_wait.sh
 CODIR=$(pwd)
 
-for gamma in $(seq -w 10 2 12)
+for gamma in $(seq -w 4 2 6)
    do
 
    for beta in $(seq -w 2.0 0.5 3.0)
@@ -22,7 +22,7 @@ for gamma in $(seq -w 10 2 12)
 
          cp $CODIR/lancio.sh $WODIR/lancio.tp
 
-         for x in $(seq 1 1 8)
+         for x in $(seq 1 1 16)
             do
 
             WODIR_core=$WODIR/core_$x
