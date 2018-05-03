@@ -8,7 +8,7 @@ define                  Delta0  1000.0
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
-dmrg_states                             0       0       10  40          0.0000001
+dmrg_states                     0       0       10  40          0.0000001
 dmrg_timestates         0.0     0       0       10      2000            0.000001
 
 
