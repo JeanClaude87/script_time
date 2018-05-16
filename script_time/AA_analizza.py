@@ -9,7 +9,7 @@ import re
 import AA_functions as ff
 
 
-LOCAL = os.path.abspath('../')
+LOCAL = os.path.abspath('../../')
 
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
