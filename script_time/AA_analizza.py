@@ -17,7 +17,11 @@ LOCAL = os.path.abspath('../../')
 print(LOCAL)
 
 path_file = LOCAL+'/DATI*/*/*/'
+
 directory = sorted(glob.glob(path_file))	
+
+print(directory)
+
 namesLD = ff.folder_crea(LOCAL,directory)
 
 for kk,name in enumerate(namesLD):
