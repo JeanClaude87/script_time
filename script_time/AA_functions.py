@@ -32,12 +32,12 @@ def	Io_fascio_tuto(name,LOCAL):
 
 	Big_Mat = np.zeros((n_rel,t_max,L_int), dtype=np.float)
 
-	i=0
+	print(All_files)
 
+	i=0
 	for filename in All_files:
 
 		dir_path  = os.path.dirname(filename)
-		print(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
 		print(corrcon_file, (i+1), '/', n_rel)
 
