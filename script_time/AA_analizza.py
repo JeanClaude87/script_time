@@ -14,6 +14,8 @@ LOCAL = os.path.abspath('../../')
 #....................dopo avere creato cartelle e sotto cartelle
 #....................restituisce in un vettori le varie possibili combinazioni L,D
 
+print(LOCAL)
+
 path_file = LOCAL+'/DATI*/*/*/'
 directory = sorted(glob.glob(path_file))	
 namesLD = ff.folder_crea(LOCAL,directory)
