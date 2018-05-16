@@ -37,6 +37,7 @@ def	Io_fascio_tuto(name,LOCAL):
 	for filename in All_files:
 
 		dir_path  = os.path.dirname(filename)
+		print(filename)
 		corrcon_file = dir_path+'/corr_con.prp'
 		print(corrcon_file, (i+1), '/', n_rel)
 
