@@ -20,7 +20,7 @@ def	Io_fascio_tuto(name,LOCAL):
 
 	L,D = name
 
-	t_max=10002
+	t_max=4000
 	L_int = int(L)
 
 	print("L", L)
