@@ -25,7 +25,7 @@ def	Io_fascio_tuto(name,LOCAL):
 
 	print("L", L)
 
-	dir_nameALL = LOCAL+'DATI/**/L_'+L+'/D_'+D+'/*/corr.prp'
+	dir_nameALL = LOCAL+'DATI/**/L_'+L+'/D_'+D+'/**/corr.prp'
 	All_files = glob.glob(dir_nameALL, recursive=True)
 	
 	n_rel=len(All_files)
