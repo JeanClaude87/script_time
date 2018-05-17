@@ -5,13 +5,13 @@ CODIR=$(pwd)
 rm -f $CODIR/script_wait.sh
 printf "%s\n" "#!/bin/bash" >> $CODIR/script_wait.sh
 
-for gamma in $(seq -w 4 2 6)
+for gamma in $(seq -w 14 2 14)
    do
 
-   for beta in $(seq -w 2.0 0.5 3.0)
+   for beta in $(seq -w 2.0 1.0 5.0)
       do
 
-      for alpha in $(seq -w 1 1 2)
+      for alpha in $(seq -w 1 1 50)
          do
 
          basetime=$(date +%s%N)
