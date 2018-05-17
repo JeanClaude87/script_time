@@ -2,14 +2,38 @@ define                  L               14
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta   4.0
+define                  Delta   5.0
 define                  Delta0  1000.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
 dmrg_states                     0       0       10  40          0.0000001
-dmrg_timestates         0.0     0       0       10      2000            0.000001
+dmrg_timestates         0.0     0       0       10  400        0.000001
+
+
+//...............Define random sites
+define                  ran0    random1m1(0)
+define                  ran1    random1m1(1)
+define                  ran2    random1m1(2)
+define                  ran3    random1m1(3)
+define                  ran4    random1m1(4)
+define                  ran5    random1m1(5)
+define                  ran6    random1m1(6)
+define                  ran7    random1m1(7)
+define                  ran8    random1m1(8)
+define                  ran9    random1m1(90)
+define                  ran10    random1m1(10)
+define                  ran11    random1m1(11)
+define                  ran12    random1m1(12)
+define                  ran13    random1m1(13)
+define                  ran14    random1m1(14)
+define                  ran15    random1m1(15)
+define                  ran16    random1m1(16)
+define                  ran17    random1m1(17)
+define                  ran18    random1m1(18)
+define                  ran19    random1m1(19)
+
 
 
 memory                          80000
@@ -69,11 +93,11 @@ ham_begin       Sites
 
                 do      i       0       Sites-1 1
                 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2            
                                 action  Sp      i
                                 action  Sm      i+1
 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2            
                                 action  Sm      i
                                 action  Sp      i+1
 
@@ -108,7 +132,7 @@ define  tstep                                           0.25
 trotter         time
                                 time_zips                       10
                                 timestep                        tstep
-                                steps_number                    20 //4001
+                                steps_number                    4001
                                 target  psi                     0
 
 
@@ -129,12 +153,100 @@ trotter         time
                         term    coeff           V*t                     
                                 action  Sz      i
                                 action  Sz      i+1             
-
-                        term    coeff           Delta*random1m1(i)      
-                                action  Sz      i
         
                 done
 
+                term    coeff   Delta*ran0    
+                        action  Sz       0
+
+                term    coeff   Delta*ran1    
+                        action  Sz       1
+
+                term    coeff   Delta*ran2     
+                        action  Sz       2
+
+                term    coeff   Delta*ran3     
+                        action  Sz       3
+
+                if  Sites>4
+                term    coeff   Delta*ran4     
+                        action  Sz       4
+                endif
+
+                if  Sites>5
+                term    coeff   Delta*ran5     
+                        action  Sz       5
+                endif
+
+                if  Sites>6
+                term    coeff   Delta*ran6     
+                        action  Sz       6
+                endif
+
+                if  Sites>7
+                term    coeff   Delta*ran7     
+                        action  Sz       7
+                endif
+
+                if  Sites>8
+                term    coeff   Delta*ran8     
+                        action  Sz       8
+                endif
+
+                if  Sites>9
+                term    coeff   Delta*ran9     
+                        action  Sz       9
+                endif
+
+                if  Sites>10
+                term    coeff   Delta*ran10    
+                        action  Sz       10
+                endif
+
+                if  Sites>11
+                term    coeff   Delta*ran11     
+                        action  Sz       11
+                endif
+
+                if  Sites>12
+                term    coeff   Delta*ran12     
+                        action  Sz       12
+                endif
+
+                if  Sites>13
+                term    coeff   Delta*ran13    
+                        action  Sz       13
+                endif
+
+                if  Sites>14
+                term    coeff   Delta*ran14     
+                        action  Sz       14
+                endif
+
+                if  Sites>15
+                term    coeff   Delta*ran15     
+                        action  Sz       15
+                endif
+
+                if  Sites>16
+                term    coeff   Delta*ran16    
+                        action  Sz       16
+                endif
+
+                if  Sites>17
+                term    coeff   Delta*ran17    
+                        action  Sz       17
+                endif
+
+                if  Sites>18
+                term    coeff   Delta*ran18    
+                        action  Sz       18
+                endif                
+
+                if  Sites>19
+                term    coeff   Delta*ran19    
+                        action  Sz       19
+                endif
 
         timeham_end             
 
