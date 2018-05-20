@@ -450,7 +450,6 @@ void trotter (Block & system, Block & universe)
 
 	double tprop;
 	tprop = fmod(t+tau/10,10);
-	cout << "BELVA" << tprop << endl;
 	if ( fabs(tprop) < tau/10) {
       properties (system, universe, phi [0], phi [0], norm2, t); 
       }
