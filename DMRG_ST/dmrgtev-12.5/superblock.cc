@@ -278,7 +278,7 @@ void trotter (Block & system, Block & universe)
        << setw (15) << setprecision (10) << norm2
        << " zip" << setw (3) << zips
        << resetiosflags (ios_base::fixed) << right << showpoint
-       << setw (10) << setprecision (3)
+       << setw (8) << setprecision (3)
        << truncation << right << " " << lft_sites << "+" << rgt_sites
        << " (" << system .states () << "x" << universe .states () << ")"
        << endl;
@@ -437,22 +437,15 @@ void trotter (Block & system, Block & universe)
 	   << setw (15) << setprecision (10) << norm2
 	   << setw (15) << setprecision (10) << norm0
 	   << " zip" << setw (3) << zips
-	   << "  "   << resetiosflags (ios_base::fixed) << right << showpoint
+	   << resetiosflags (ios_base::fixed) << right << showpoint
 	   << setw (8) << setprecision (3)
 	   << truncation << right << " " << lft_sites << "+" << rgt_sites
 	   << " (" << system .states () << "x" << universe .states () << ")"
-	   << endl; 
+	   << endl;
       //
     } // if (zips <= ...
     else { // zips > zipmax:  advance timestep
-    //properties every 10 tstep
-//    if (tsteps % 10 == 0) {
-
-	double tprop;
-	tprop = fmod(t+tau/10,10);
-	if ( fabs(tprop) < tau/10) {
       properties (system, universe, phi [0], phi [0], norm2, t); 
-      }
             double ent = phi [0] .entropy ();
             cout << "Entropy " << setw (14) << setprecision (10) << t << "   " << ent << endl;   
       tsteps++;

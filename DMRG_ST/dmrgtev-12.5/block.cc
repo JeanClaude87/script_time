@@ -1339,8 +1339,8 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     }            
     if (cut_states_number < min) max = min;
     if (cut_states_number > max) min = max;
-    //cout << "States -> Cut / Min / Max = " << cut_states_number << "  " 
-	// << min << "  " << max << endl;
+    cout << "States -> Cut / Min / Max = " << cut_states_number << "  " 
+	 << min << "  " << max << endl;
   }
 
   
