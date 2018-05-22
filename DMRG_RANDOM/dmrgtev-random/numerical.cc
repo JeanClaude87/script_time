@@ -367,7 +367,7 @@ void random_vector (double * v, size_t dimension)
   //
   if (first_time) {
     first_time = false;
-    srand48 (43825644L);
+//    srand48 (43825644L);
   }
   double meanvalue = drand48 () - 0.5;
   double norm      = 0.0;

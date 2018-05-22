@@ -298,6 +298,7 @@ void trotter (Block & system, Block & universe)
 			cout << "Null evolving state!" << endl;
 			return;
 		}
+
 		if (t < tau) {
 			hamt_parse (sites, t);
 			hamiltonian += (-E0);
@@ -452,14 +453,14 @@ void trotter (Block & system, Block & universe)
 
       double tprop;
       tprop = fmod(t+tau/10,10);
-      if ( fabs(tprop) < tau/10) {
+      cout << "Entropy " << setw (14) << setprecision (10) << tprop << "   " << tau/10 << endl;   
+      if ( fabs(tprop) <= tau/10) {
         properties (system, universe, phi [0], phi [0], norm2, t); 
+        hamiltonian .show ("Hamiltonian polinomial:");
       }
       double ent = phi [0] .entropy ();
       cout << "Entropy " << setw (14) << setprecision (10) << t << "   " << ent << endl;   
       tsteps++;
-
-      hamiltonian .show ("Hamiltonian polinomial:");
 
       if (tsteps >= steps_number) break;
       zips   =  0;
