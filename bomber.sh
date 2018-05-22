@@ -32,7 +32,7 @@ for gamma in $(seq -w 14 2 14)
                then mkdir -p $WODIR_core
             fi
 
-            cp DMRG_ST/dmrgtev-12.5/dmrgtev $WODIR_core
+            cp DMRG_RANDOM/dmrgtev-random/dmrgtev $WODIR_core
 
             IN=L_$gamma-D_$beta-$basetime-core_$x.inp
             OUT=L_$gamma-D_$beta-$basetime-core_$x.out
