@@ -9,7 +9,7 @@ define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
 dmrg_states                     0       0       10  40          0.0000001
-dmrg_timestates         0.0     0       0       10  400        0.000001
+dmrg_timestates         0.0     0       0       10  400        0.0000001
 
 memory                          80000
 show                                    memory
@@ -125,7 +125,7 @@ trotter         time
                                 action  Sz      i
                                 action  Sz      i+1             
         
-                        term    coeff           Delta0*random1m1(i)     
+                        term    coeff           Delta*random1m1(i)     
                                 action  Sz      i
         
                 done

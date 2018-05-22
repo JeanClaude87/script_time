@@ -11,7 +11,7 @@ for gamma in $(seq -w 14 2 14)
    for beta in $(seq -w 2.0 1.0 5.0)
       do
 
-      for alpha in $(seq -w 1 1 1)
+      for alpha in $(seq -w 1 1 40)
          do
 
          basetime=$(date +%s%N)
