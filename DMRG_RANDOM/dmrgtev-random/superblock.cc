@@ -287,6 +287,8 @@ void trotter (Block & system, Block & universe)
 
 
   int time_site = 0;
+  double tprop;
+
   while (true) {
     //
     //	check for new sweep
@@ -307,11 +309,10 @@ void trotter (Block & system, Block & universe)
 
       hamt_parse (sites, t);
       hamiltonian += (-E0);
-      
-      hamiltonian .show ("Hamiltonian polinomial:");      
-
       time_site++;
       }
+
+      hamiltonian .show ("Hamiltonian polinomial:");  
 
 			//
 			// AAAAA  TO DO
@@ -459,15 +460,14 @@ void trotter (Block & system, Block & universe)
     } // if (zips <= ...
     else { // zips > zipmax:  advance timestep
     //properties every 10 tstep
-//    if (tsteps % 10 == 0) {
-
-      double tprop;
-      tprop = fmod(t+tau/10,10);
-      cout << "Entropy " << setw (14) << setprecision (10) << tprop << "   " << tau/10 << endl;   
+/*      tprop = fmod(t+tau/10,10);
       if ( fabs(tprop) <= tau/10) {
         properties (system, universe, phi [0], phi [0], norm2, t); 
-        hamiltonian .show ("Hamiltonian polinomial:");
       }
+*/  
+
+      properties (system, universe, phi [0], phi [0], norm2, t); 
+
       double ent = phi [0] .entropy ();
       cout << "Entropy " << setw (14) << setprecision (10) << t << "   " << ent << endl;   
       tsteps++;
