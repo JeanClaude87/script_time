@@ -270,7 +270,7 @@ void trotter (Block & system, Block & universe)
   cout << setw (8)  << "time"
        << setw (15) << "<V(t)|V(t)>"
        << setw (15) << "<V(0)|V(0)>"
-       << setw (15) << "Zip error"
+       << setw (15) << "Zip error UGA"
        << setw (15) << "sites (states)"
        << endl;
   cout << setw (8)  << setprecision (4) << fixed << t
@@ -284,6 +284,7 @@ void trotter (Block & system, Block & universe)
        << endl;
   phi [2] = phi [0];
   properties (system, universe, phi [0], phi [0], norm2, t);
+
   while (true) {
     //
     //	check for new sweep
@@ -294,6 +295,9 @@ void trotter (Block & system, Block & universe)
       te = t + tau;
     }
     if (zips <= time_zips) {
+
+      cout << "Null evolving state!" << zips << "  " << time_zips << endl;
+
 		if (norm2 < 1.e-06) {
 			cout << "Null evolving state!" << zips << "  " << time_zips << endl;
 			return;
