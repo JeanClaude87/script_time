@@ -68,11 +68,11 @@ ham_begin       Sites
 
                 do      i       0       Sites-1 1
                 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2*0.001            
                                 action  Sp      i
                                 action  Sm      i+1
 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2*0.001            
                                 action  Sm      i
                                 action  Sp      i+1             
 
