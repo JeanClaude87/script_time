@@ -303,7 +303,7 @@ void trotter (Block & system, Block & universe)
 		if (time_site == 0) {
 			hamt_parse (sites, t);
 			hamiltonian += (-E0);
-      i++;
+      time_site++;
       }
 
 			//
