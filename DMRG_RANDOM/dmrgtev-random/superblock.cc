@@ -301,6 +301,7 @@ void trotter (Block & system, Block & universe)
 
     int time_site = 0;
 		if (time_site == 0) {
+      cout << "Ho parsato" << endl;
 			hamt_parse (sites, t);
 			hamiltonian += (-E0);
       time_site++;
