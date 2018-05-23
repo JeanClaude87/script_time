@@ -295,11 +295,12 @@ void trotter (Block & system, Block & universe)
     }
     if (zips <= time_zips) {
 		if (norm2 < 1.e-06) {
-			cout << "Null evolving state!" << endl;
+			cout << "Null evolving state!" << zips << "  " << time_zips << endl;
 			return;
 		}
 
     int time_site = 0;
+
 		if (time_site == 0) {
       cout << "Ho parsato " << time_site << endl;
 			hamt_parse (sites, t);
