@@ -2,14 +2,14 @@ define                  L               14
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta   5.0
+define                  Delta  0.0
 define                  Delta0  1000.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
-dmrg_states                     0       0       10  40          0.0000001
-dmrg_timestates         0.0     0       0       10  400        0.000001
+dmrg_states                     0       0       50  50         0
+dmrg_timestates         0.0     0       0       400  400       0
 
 memory                          80000
 show                                    memory
@@ -68,13 +68,17 @@ ham_begin       Sites
 
                 do      i       0       Sites-1 1
                 
-                        term    coeff           t/2*0.001            
+                        term    coeff           t/2 
                                 action  Sp      i
                                 action  Sm      i+1
 
-                        term    coeff           t/2*0.001            
+                        term    coeff           t/2          
                                 action  Sm      i
                                 action  Sp      i+1             
+
+                        term    coeff           1000*t
+                                action  Sz      i
+                                action  Sz      i+1
 
                         term    coeff           Delta0*random1m1(i)     
                                 action  Sz      i
