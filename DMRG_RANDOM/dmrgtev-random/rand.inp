@@ -2,7 +2,7 @@ define                  L               14
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta  0.0
+define                  Delta  0.0001
 define                  Delta0  1000.0
 
 define                  iu              sqrt(-1.0)
