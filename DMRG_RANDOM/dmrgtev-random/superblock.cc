@@ -285,6 +285,8 @@ void trotter (Block & system, Block & universe)
   phi [2] = phi [0];
   properties (system, universe, phi [0], phi [0], norm2, t);
 
+
+  int time_site = 0;
   while (true) {
     //
     //	check for new sweep
@@ -296,19 +298,18 @@ void trotter (Block & system, Block & universe)
     }
     if (zips <= time_zips) {
 
-      cout << "Null evolving state!" << zips << "  " << time_zips << endl;
-
 		if (norm2 < 1.e-06) {
 			cout << "Null evolving state!" << zips << "  " << time_zips << endl;
 			return;
 		}
 
-    int time_site = 0;
-
 		if (time_site == 0) {
-      cout << "Ho parsato " << time_site << endl;
-			hamt_parse (sites, t);
-			hamiltonian += (-E0);
+
+      hamt_parse (sites, t);
+      hamiltonian += (-E0);
+      
+      hamiltonian .show ("Hamiltonian polinomial:");      
+
       time_site++;
       }
 
