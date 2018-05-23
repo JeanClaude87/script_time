@@ -299,10 +299,10 @@ void trotter (Block & system, Block & universe)
 			return;
 		}
 
-		if (t < tau) {
+//		if (t < tau) {
 			hamt_parse (sites, t);
 			hamiltonian += (-E0);
-		}
+//		}
 			//
 			// AAAAA  TO DO
 			// Aggiungere evoluzione dei fattori costanti
