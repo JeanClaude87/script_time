@@ -709,13 +709,15 @@ void evolution (Block & system, Block & universe)
                 }
             }
             updatebase (system, universe, zipdir);
+
+            hamiltonian .show ("Hamiltonian polinomial:");
             
-            if (zips == time_zips) {
+/*            if (zips == time_zips) {
             	double ent = phi [0] .entropy ();
             	cout << "Entropy_inner " << setw (10) << setprecision (6) << fixed
                 << t << setw (10) << setprecision (6) << fixed
                 << system .sites () << " " << setw (14) << setprecision (10) << ent << endl; }               
-            
+ */           
             
             if (zipdir < 0) {
                 universe .reflectreset ();
