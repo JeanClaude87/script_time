@@ -99,8 +99,8 @@ ham_end
                 done
 
 
-//..................................................................EVOLUZIONE  TEMPORALE
-
+//..................................................................EVOLUZIONE  TEMPORALE_TROTTER
+/*
 
 define  tstep                                           0.05
 
@@ -109,7 +109,16 @@ trotter         time
                                 timestep                        tstep
                                 steps_number                    4
                                 target  psi                     0
+*/
 
+
+//..................................................................TIME_EVO
+
+evolution               time
+                                time_zips                               1
+                                timestep                                0.05
+                                steps_number                            4
+                                target psi                              0
 
 //..................................................................HAMILTONIANA DINAMICA
 
@@ -169,4 +178,3 @@ trotter         time
 
                 end
 
-//ugauaguaguagaugauaguagauag
