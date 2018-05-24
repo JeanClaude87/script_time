@@ -795,12 +795,15 @@ void evolution (Block & system, Block & universe)
             //
             phi [4] = Action(system .quantum (), universe .quantum ());
 
-            cout << "UGA" << endl;
+            cout << "UGA1" << endl;
 
             projection (phi [4], system, universe, phi [0], oldsystem, olduniverse);
             //
             phi [0] = phi [4];
             phi [1] = Action(system .quantum (), universe .quantum ());
+
+            cout << "UGA2" << endl;
+
             projection (phi [1], system, universe, phi [6], oldsystem, olduniverse);
             //
             phi [6] = phi [1];
