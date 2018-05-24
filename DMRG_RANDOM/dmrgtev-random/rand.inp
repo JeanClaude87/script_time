@@ -2,8 +2,9 @@ define                  L               20
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta   1.0
-define                  Delta0  1000.0
+define                  V0              100.0
+define                  Delta   0.0
+define                  Delta0  100.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
@@ -76,7 +77,7 @@ ham_begin       Sites
                                 action  Sm      i
                                 action  Sp      i+1             
 
-                        term    coeff           1000*t
+                        term    coeff           V0*t
                                 action  Sz      i
                                 action  Sz      i+1
 
