@@ -1,15 +1,15 @@
-define                  L               14
+define                  L               20
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta  0.0001
+define                  Delta   0.0
 define                  Delta0  1000.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
 dmrg_states                     0       0       50  50         0
-dmrg_timestates         0.0     0       0       400  400       0
+dmrg_timestates         0.0     0       0       10  10         0
 
 memory                          80000
 show                                    memory
@@ -102,12 +102,12 @@ ham_end
 //..................................................................EVOLUZIONE  TEMPORALE
 
 
-define  tstep                                           0.25
+define  tstep                                           0.05
 
 trotter         time
                                 time_zips                       10
                                 timestep                        tstep
-                                steps_number                    4001
+                                steps_number                    4
                                 target  psi                     0
 
 
