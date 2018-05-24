@@ -709,8 +709,6 @@ void evolution (Block & system, Block & universe)
                 }
             }
             updatebase (system, universe, zipdir);
-
-            hamiltonian .show ("Hamiltonian polinomial:");
             
 /*            if (zips == time_zips) {
             	double ent = phi [0] .entropy ();
@@ -796,6 +794,9 @@ void evolution (Block & system, Block & universe)
             if (reflect_universe) universe .reflect ();
             //
             phi [4] = Action(system .quantum (), universe .quantum ());
+
+            cout << "UGA" << endl;
+
             projection (phi [4], system, universe, phi [0], oldsystem, olduniverse);
             //
             phi [0] = phi [4];
