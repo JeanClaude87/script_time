@@ -55,7 +55,7 @@ for gamma in $(seq -w 12 2 12)
 
             cd \${WORKDIR}
 
-            nohup ./dmrgtev < $IN > $OUT 
+            nohup ./dmrgtev < $IN > $OUT &
 
             cd \${CODIR}
 
