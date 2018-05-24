@@ -4,7 +4,7 @@ define                  t               -1.0
 define                  V               2.0
 define                  V0              100.0
 define                  Delta   0.0
-define                  Delta0  100.0
+define                  Delta0  0.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
