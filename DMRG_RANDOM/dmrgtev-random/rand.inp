@@ -10,7 +10,7 @@ define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
 dmrg_states                     0       0       50  50         0
-dmrg_timestates         0.0     0       0       100  100         0
+dmrg_timestates         0.0     0       0       10  100         0.0001
 
 memory                          80000
 show                                    memory
