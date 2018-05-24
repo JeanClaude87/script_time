@@ -9,6 +9,7 @@
 #include "block.hh"
 #include "numerical.hh"
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -115,7 +116,7 @@ void Amono::reorder (size_t modulus)
   //	Fix indexes in range [0, modulus)
   //
   if (modulus)
-    for (i = 0; i < order (); i++) {
+    for (i = 0; i < order (); ++i) {
       long & site = am_factor [i] .af_st;
       while (site < 0) site += modulus;
       site %= modulus;
@@ -125,7 +126,7 @@ void Amono::reorder (size_t modulus)
   //	Fermi-Bose statistic from primitive action definitions in one 
   //	site Block.
   //
-  for (i = 1; i < order (); i++) 
+  for (i = 1; i < order (); ++i) 
     if (am_factor [i-1] .af_st > am_factor [i] .af_st) {
       Afactor tmp = am_factor [i];
       long tstat  = point .action (tmp .af_op, 0) .statistic ();
@@ -146,7 +147,7 @@ string Amono::str () const
   //
   string s = "";
   if (order () == 0) s = "[Id]";
-  for (size_t m = 0; m < order (); m++) {
+  for (size_t m = 0; m < order (); ++m) {
     if (m) s = s + " ";
     s = s + am_factor [m] .str ();
   }
@@ -205,7 +206,7 @@ Apoli & Apoli::operator += (const Amono & mono)
   //
   size_t insert;
   if (abs (mono. am_coeff) == 0.0) return *this;
-  for (insert = 0; insert < size (); insert++) {
+  for (insert = 0; insert < size (); ++insert) {
     if (ap_mono [insert] == mono) {
       //
       //  Monomial present. Update coefficient.
@@ -253,7 +254,7 @@ Apoli & Apoli::operator += (const Apoli & other)
   //
   //	Polinomial sum
   //
-  for (size_t m = 0; m < other .size (); m++) *this += other [m];
+  for (size_t m = 0; m < other .size (); ++m) *this += other [m];
   return *this;
 }
 //
@@ -263,7 +264,7 @@ Apoli & Apoli::operator *= (complex<double> number)
   //
   //	Multiply by a constant
   //
-  for (size_t m = 0; m < size (); m++) ap_mono [m] *= number;
+  for (size_t m = 0; m < size (); ++m) ap_mono [m] *= number;
   return *this;
 }
 //
@@ -273,7 +274,7 @@ Apoli & Apoli::operator *= (const Afactor & af)
   //
   //	Multiply by a factor
   //
-  for (size_t m = 0; m < size (); m++) ap_mono [m] *= af;
+  for (size_t m = 0; m < size (); ++m) ap_mono [m] *= af;
   return *this;
 }
 //
@@ -288,7 +289,7 @@ Apoli & Apoli::operator /= (complex<double> number)
     exit (0);
   }
   number = 1.0 / number;
-  for (size_t m = 0; m < size (); m++) ap_mono [m] *= number;
+  for (size_t m = 0; m < size (); ++m) ap_mono [m] *= number;
   return *this;
 }
 //
@@ -299,7 +300,7 @@ size_t Apoli::order () const
   //	Returns the degree of the polinomial
   //
   size_t degree = 0;
-  for (size_t m = 0; m < size (); m++) 
+  for (size_t m = 0; m < size (); ++m) 
     if (ap_mono [m] .order () > degree) degree = ap_mono [m] .order ();
   return degree;
 }
@@ -311,7 +312,7 @@ void Apoli::reorder (size_t modulus)
   //	reorder monomial operators (and whole polinomial)
   //
   Apoli next;
-  for (size_t n = 0; n < size (); n++) {
+  for (size_t n = 0; n < size (); ++n) {
     ap_mono [n] .reorder (modulus);
     next += ap_mono [n];
   }
@@ -325,7 +326,7 @@ void Apoli::show (const string & s, size_t offset) const
   //	Output a representation of polinomial
   //
   if (s .size ()) cout << s << endl;
-  for (size_t m = 0; m < size (); m++)  {
+  for (size_t m = 0; m < size (); ++m)  {
     if (offset) cout << setw (offset) << "";
     string coeff = complex_str (ap_mono [m] .am_coeff) + " ";
     cout << setw (25) << right << coeff << ap_mono [m] .str () << endl;
@@ -806,7 +807,7 @@ static complex<double>	complex_value (const string & s)
 	if (z .imag () )  z = 0.0 ;
 	else if (z .real () > 0.0) z = 1.0;
 	else z = 0.0;
-      }				    
+      }			    
       else {
 	cout << "Unknown function " << s 
 	     << " (complex) ... (aborting)" << endl;
@@ -1099,7 +1100,7 @@ static size_t name_entry (const string & name, vector<string> & namelist)
   //	If the name is not found it is added to the list
   //
   size_t i;
-  for (i = 0; i < namelist .size (); i++) 
+  for (i = 0; i < namelist .size (); ++i) 
     if (namelist [i] == name) return i;
   namelist .push_back (name);	// add name to list
   return i;

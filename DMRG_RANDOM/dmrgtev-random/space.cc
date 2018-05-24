@@ -135,24 +135,6 @@ Space::Space (const Space & other)
 }
 //
 //____________________________________________________________________________
-Space::Space (const Space & lft, const Space & rgt)
-  : s_subspace	(1)
-{
-  //
-  //	Create a Space tensor product of lft and rgt
-  //
-  size_t tens = 0;
-  for (size_t rsub = 1; rsub < rgt .subspaces (); rsub++)
-    for (size_t r = 0; r < rgt .states (rsub); r++) 
-      for (size_t lsub = 1; lsub < lft .subspaces (); lsub++) {
-	tens++;
-	s_subspace .push_back (Subspace ());
-	statistic (tens, lft .statistic (lsub) * rgt .statistic (rsub));
-	states (tens, lft .states (lsub));
-      }      
-}
-//
-//____________________________________________________________________________
 Space::~Space ()
 { 
   //
@@ -220,19 +202,6 @@ Qspace::Qspace (const Qspace & lft, const Qspace & rgt, const double qa)
 	size_t statistic = lft .statistic (lb) * rgt .statistic (rb);
 	add_states (sum, states, statistic);
       }  
-}
-//
-//____________________________________________________________________________
-size_t Qspace::add_space (const Qnumber & qn, size_t n, long fb)
-{
-  size_t sub = subspaces ();
-  size_t position = states ();
-  s_subspace .push_back (Subspace ());
-  qs_number  .push_back (qn);
-  statistic (sub, fb);
-  states (sub, n);
-  offsets ();
-  return position;
 }
 //
 //____________________________________________________________________________

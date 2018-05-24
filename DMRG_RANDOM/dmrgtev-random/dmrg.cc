@@ -13,7 +13,6 @@ void hamiltonian_energies (Block &, Block &, Qtarget &);    // [superblock.cc]
 void properties		  (Block &, Block &);	   	    // [superblock.cc]
 void evolution            (Block &, Block &);		    // [superblock.cc]	
 bool quantum_alternate	  ();					  // [menu.cc]
-void trotter              (Block &, Block &);		    // [superblock.cc]	
 void updatebase		  (Block &, Block &, long);	    // [superblock.cc]
 //
 //============================================================================
@@ -26,10 +25,10 @@ bool			reflect_universe	= false;
 size_t			reflection		= 0;
 double			truncation		= 0.0;
 //
-size_t	   	    show_blocks		= 0;
+size_t	   	       	show_blocks		= 0;
 size_t			show_density		= 0;
 size_t 			show_hamiltonian	= 0;
-size_t   	    show_interaction	= 0;
+size_t   	       	show_interaction	= 0;
 bool			show_point		= false;
 bool			show_memory		= false;
 size_t			show_system		= 0;
@@ -38,7 +37,6 @@ bool			show_states		= true;
 bool			show_selection		= true;
 //
 bool                    evolution_active        = false;
-bool			trotter_active		= false;
 //
 size_t			sites			= 0;
 size_t			old_sites		= 0;
@@ -59,14 +57,13 @@ size_t			zipmax			= 0;
 long			zipdir			= 0;
 size_t			zipodd			= 0;
 bool			halfsweep		= false;
-bool			forcezip		= false;
 //
 size_t			min_lft			= 0;
 size_t			max_lft			= 0;
 size_t			min_rgt			= 0;
 size_t			max_rgt			= 0;
-double          	n_cutlft       		= 0;
-double          	n_cutrgt        	= 0;
+double          n_cutlft        = 0;
+double          n_cutrgt        = 0;
 //
 size_t			idop_none		= 0;
 size_t			idop_base		= 0;
@@ -102,13 +99,13 @@ void dmrg_initialize ()
   //
   //	Define common names
   //
-  idop_none	   = name_action ("No name");
-  idop_base 	   = name_action ("Block base");
-  idop_hamiltonian = name_action ("Hamilton H");
+  idop_none	   		= name_action ("No name");
+  idop_base 	   	= name_action ("Block base");
+  idop_hamiltonian	= name_action ("Hamilton H");
   //
-  id_none 	   = name_define ("No name");
-  id_base	   = name_define ("Block base");
-  id_hamiltonian   = name_define ("Hamilton H");
+  id_none 	   		= name_define ("No name");
+  id_base	   		= name_define ("Block base");
+  id_hamiltonian	= name_define ("Hamilton H");
 }
 //
 //____________________________________________________________________________
@@ -146,9 +143,7 @@ void dmrg_process ()
     Block & rgt   = blockrgt [sites_rgt];
     //
     system   = Block (lft, blocklft [1]);
-    if (reflect_universe)     	universe = Block (blockrgt [1], rgt);
-    else	      		universe = Block (rgt, blockrgt [1]);
-    /*
+    universe = Block (rgt, blockrgt [1]);
     //
     //	Reflection in universe (left blocks are never reflected)
     //
@@ -166,21 +161,17 @@ void dmrg_process ()
       universe .reflect ();
       reflection |= 1;
     }
-    */
     //
     //	Show iteration line info
     //
     dmrg_showinfo (system, universe);
-    if (system   .sites () <= show_system) system   .show ("System   block");
-    if (universe .sites () <= show_system) universe .show ("Universe block");
-   //
+    //
     //	Find possible targets
     //
     double qa = 1.0;
     if (system .sites () % 2) qa = -1.0;
     if ((reflection & 1) && (universe .sites () % 2 == 0)) qa = -qa;
     target = Qtarget (system. quantum (), universe .quantum (), sites, qa);
-    //target .show ("target ");
     //
     //	Select targets for actual chain length
     //
@@ -239,14 +230,23 @@ void dmrg_process ()
     if (sites >= length) zipmax = zips;
     if ((sites_lft <= exact_lft) && (sites_rgt <= exact_rgt)) zipmax = 0;
     //
+
+    //
     if (zip < zipmax) {
+    
       //
       //	Finite size algorithm
       //
-      if ((sites_lft==sites_rgt) &&  (zip==5)) { 
-	properties (system, universe);
-	cout <<endl;
+      
+// ////////////////////////////////////////////////////////////////////////////////////////////////// To have properties at each sweep
+      
+  if ((sites_lft==sites_rgt) &&  (zip==5)) { 
+      		 properties (system, universe);
+            cout <<endl;
       }
+
+      // //////////////////////////////////////////////////////////////////////////////////////////////////
+      
       sites_lft += zipdir;
       sites_rgt -= zipdir;
       if (zipdir > 0) {
@@ -260,13 +260,15 @@ void dmrg_process ()
       if (sites_lft <= exact_lft) zipdir =  1;
       if (sites_rgt <= exact_rgt) zipdir = -1;
       middle = (sites_diff == (((long) sites_lft) - ((long) sites_rgt)));
-      if (halfsweep && middle) 	zipdir = -1;
+      if (halfsweep && middle) {	zipdir = -1;}
+
     }
     else {
       //
       //	system and universe have the same length or near.
       //	It is a good place for property evaluation.
       //	
+
       properties (system, universe);
       //
       //	End of DMRG algorithm
@@ -324,18 +326,18 @@ void dmrg_process ()
       size_t z = lftrule [rule] .br_zip;
       size_t s = lftrule [rule] .br_sites;
       if ((actual_zip >= z) && (system .sites () >= s)) {
-	if (min_lft < lftrule [rule] .br_min) min_lft = lftrule [rule] .br_min;
-	if (max_lft < lftrule [rule] .br_max) max_lft = lftrule [rule] .br_max;
-	n_cutlft = lftrule [rule] .br_cut;
+          if (min_lft < lftrule [rule] .br_min) min_lft = lftrule [rule] .br_min;
+          if (max_lft < lftrule [rule] .br_max) max_lft = lftrule [rule] .br_max;
+          n_cutlft = lftrule [rule] .br_cut;
       }
     }
     for (size_t rule = 0; rule < rgtrule .size (); rule++) {
       size_t z = rgtrule [rule] .br_zip;
       size_t s = rgtrule [rule] .br_sites;
       if ((actual_zip >= z) && (universe .sites () >= s)) {
-	if (min_rgt < rgtrule [rule] .br_min) min_rgt = rgtrule [rule] .br_min;
-	if (max_rgt < rgtrule [rule] .br_max) max_rgt = rgtrule [rule] .br_max;
-	n_cutrgt = rgtrule [rule] .br_cut;
+          if (min_rgt < rgtrule [rule] .br_min) min_rgt = rgtrule [rule] .br_min;
+          if (max_rgt < rgtrule [rule] .br_max) max_rgt = rgtrule [rule] .br_max;
+          n_cutrgt = rgtrule [rule] .br_cut;
       }
     }
     //
@@ -350,9 +352,6 @@ void dmrg_process ()
     if ((universe .states () <= max_rgt) && 
 	(exact_rgt == universe .sites () -1)) {
       exact_rgt = universe .sites ();
-    }
-    if (forcezip) {
-      exact_lft = exact_rgt = 1;
     }
     //
     //	Check if we need changement of basis
@@ -373,40 +372,44 @@ void dmrg_process ()
     //	Upgrade min and max numbers of states with these block sites 
     //	for next sweep or next chain length.
     //
+    
+
     size_t rlft = max_lft - min_lft;
     size_t rrgt = max_rgt - min_rgt;
+    
     if ( n_cutlft == 0 ){    
-      if (updatesys && 
-	  (min_lft < system   .states ()) &&
-	  (system .states () < max_lft)) {
+    	if (updatesys && 
+		(min_lft < system   .states ()) &&
+		(system .states () < max_lft)) {
       	min_lft = system   .states ();
       	max_lft = min_lft + rlft;
       	if (max_lft > extra_lft) max_lft = extra_lft;
-	Brule rule;
-	rule .br_zip   = actual_zip;
-	rule .br_sites = system .sites ();
-	rule .br_min   = min_lft;
-	rule .br_max   = max_lft;
-	rule .br_cut   = n_cutlft;
-	lftrule .push_back (rule);
-      }
+      	  Brule rule;
+      	  rule .br_zip   = actual_zip;
+      	  rule .br_sites = system .sites ();
+      	  rule .br_min   = min_lft;
+      	  rule .br_max   = max_lft;
+     	  rule .br_cut   = n_cutlft;
+      	  lftrule .push_back (rule);
+    	}
     }	
-    if ( n_cutrgt == 0 ){   
-      if (updateuni && 
-	  (min_rgt < universe .states ()) &&
-	  (universe .states () < max_rgt)) {
+
+	if ( n_cutrgt == 0 ){   
+    	if (updateuni && 
+		(min_rgt < universe .states ()) &&
+		(universe .states () < max_rgt)) {
       	min_rgt = universe .states ();
       	max_rgt = min_rgt + rrgt;
       	if (max_rgt > extra_rgt) max_rgt = extra_rgt;
-	Brule rule;
-	rule .br_zip   = actual_zip;
-	rule .br_sites = universe .sites ();
-	rule .br_min   = min_rgt;
-	rule .br_max   = max_rgt;
-	rule .br_cut   = n_cutrgt;
-	rgtrule .push_back (rule);
-      }
-    }
+      	  Brule rule;
+      	  rule .br_zip   = actual_zip;
+      	  rule .br_sites = universe .sites ();
+      	  rule .br_min   = min_rgt;
+      	  rule .br_max   = max_rgt;
+      	  rule .br_cut   = n_cutrgt;
+      	  rgtrule .push_back (rule);
+    	}
+	}
     //
     //	Some output if requested
     //
@@ -423,7 +426,7 @@ void dmrg_process ()
 	   << system .states () << " states. Update = " << updatesys << endl;
     }
     if (halfsweep && middle) {
-      for (size_t n = 2; n <= sites_rgt; n++) { 
+      for (size_t n = 2; n <= sites_rgt; ++n) { 
 	old_sites = 0; 	// to avoid projection
 	if (n < blockrgt .size ()) 
 	  blockrgt [n] .actionclear (0, name_action ()); 
@@ -440,12 +443,11 @@ void dmrg_process ()
       cout << "Updated blockrgt [" << universe .sites () << "] " 
 	   << universe .states () << " states. Update = " << updateuni << endl;
     }
-    for (size_t n = 2; n < blocklft .size (); n++) blocklft [n] .release ();
-    for (size_t n = 2; n < blockrgt .size (); n++) blockrgt [n] .release ();
+    for (size_t n = 2; n < blocklft .size (); ++n) blocklft [n] .release ();
+    for (size_t n = 2; n < blockrgt .size (); ++n) blockrgt [n] .release ();
     } // while (true)
   //
-  if (evolution_active) 	evolution (system, universe);
-  else if (trotter_active) 	trotter   (system, universe);
+  if (evolution_active) evolution(system, universe);
 }
 //
 //____________________________________________________________________________
@@ -458,14 +460,22 @@ void	dmrg_showinfo (const Block & system, const Block & universe)
   size_t sl, sr, ul, ur;
   sl = system .siteslft ();
   sr = system .sitesrgt ();
-  out << "> Sweep " << zip << ": (" << sl << "+" << sr << ")";
+  out << "> Sweep " << zip << ": " << sl << "+" << sr;
   ul = universe .siteslft ();
   ur = universe .sitesrgt ();
-  if (ul) out << "+(" << ul;
-  if (ur) out << "+" << ur << ")";
+  if (ul) out << "+" << ul;
+  if (ur) out << "+" << ur;
   out << "=" << sites << " ";
-  size_t hs = system .states () * universe .states ();
-  out << system .states () << "x" << universe .states ();
+  size_t hs = blocklft [sl] .states () * blocklft [sr] .states ();
+  out << blocklft [sl] .states () << "x" << blocklft [sr] .states ();
+  if (ul) {
+    out << "x" << blockrgt [ul] .states ();
+    hs *= blockrgt [ul] .states ();
+  }
+  if (ur) {
+    out << "x" << blockrgt [ur] .states ();
+    hs *= blockrgt [ur] .states ();
+  }
   out << "=" << hs << " states ";
   if (truncation > 0.0) 
     out << "(" << scientific << setprecision (2) << truncation << ") ";

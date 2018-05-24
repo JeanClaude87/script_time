@@ -8,7 +8,7 @@
 //      NB:     Dimension of inner matrix blocks
 //
 #define NP              16
-#define NB              56
+#define NB              224
 //
 //      CLNB:           lenght in bytes of level 1 cache line
 //      CLND:           lengh in doubles of level 1 cache line
@@ -17,8 +17,8 @@
 //      CSHB:           log2 (CLNB)
 //      CSHD:           log2 (CLND)
 //
-#define CLNB            64
-#define CLND            8
+#define CLNB            256
+#define CLND            32
 #define CSHB            6
 #define CSHD            3
 //

@@ -186,30 +186,24 @@ Block::Block (const Block & lft, const Block & rgt)
   //	The order of insertion is important and must be consistent 
   //	with the building of operators as tensor product of left and 
   //	right Block operators. 
-  //	We choose to order states |i1;i2> with a double loop on i1, i2 with 
+  //	We choose to insert states |i1;i2> with a double loop on i1, i2 with 
   //	left index i1 running more quickly. 
   //
-  //	The resulting states are then grouped and reordered with respect 
-  //	to the composition of quantum numbers:
-  //
+  //	The resulting states are not in this order because they are grouped 
+  //	and reordered with respect to the composition of quantum numbers:
   //		q(i1,i2) = q(i1) + q(i2)
   //
   //	The reordering of states is remembered in the array b_tensororder
   //	(built in Block::addstates ()).
   //
-  //	Adding states defines also the space structure of the lattice block. 
-  //	This is recorded in the Qspace b_quantum and Qspace b_tensor. 
-  //	b_tensor is the original full tensor product (order with insertion)
-  //	b_uantum is eventually a subset (selected in dependency of quantum
-  //	numbers) of b_tensor states, ordered according to their quantum 
-  //	numbers.
-  //
-  //	b_tensor is never changed, while b_quantum can be changed by a 
-  //	mixing and selection of states. 
-  //	A particular Action represents the corresponding transformation 
-  //	(as an Action from Qspace b_quantum to Qspace b_tensor).
-  //	
-  //	 | q_n > = \sum | i1;i2 > < i1;i2 | q_n >
+  //	Adding states defines also the quantum space structure of the 
+  //	lattice block. This is recorded in the Qspace b_quantum and
+  //	b_tensor which are initially (here) identical. b_tensor
+  //	is never changed, while b_quantum can be changed by a redefinition 
+  //	of states. A particular Action represents the correspomdding 
+  //	transformation (as an action from b_tensor Space to b_quantum Space).
+  //	Initially this matrix would be the identity matrix and its definition
+  //	is avoided.
   //
   Qspace select;
   le = lft .subspaces ();
@@ -223,20 +217,11 @@ Block::Block (const Block & lft, const Block & rgt)
 	Qnumber q  = compose (lft .number (lb), rgt .number (rb), alternate);
 	long    fb = lft .quantumstat (lb) * rgt .quantumstat (rb);
 	size_t  states = lft .b_quantum .states (lb);
-	add_states (q, states, fb, 
-		    lft .quantum().rgtlnk(lb) == rgt .quantum().lftlnk(rb));
+	add_states (q, states, fb);
+	if (lft .quantum () .rgtlnk (lb) == rgt .quantum () .lftlnk (rb))
+	  select .add_states (q, states, fb);
       }
   }
-  /*
-  for (size_t i = 0; i < lft .b_states; i++) {
-    for (size_t j = 0; j < rgt .b_states; j++)
-      cout << " " << setw (3) << b_tensororder [i + j * lft .b_states];
-    cout << endl;
-  }
-  */
-  (void) base ();
-  //
-  /*
   if (select .states () < b_tensor .states ()) {
     b_states  = select .states ();
     b_quantum = select;
@@ -269,7 +254,6 @@ Block::Block (const Block & lft, const Block & rgt)
     base .scalar (1.0);
     base .statistic (1);
   }
-  */
 }
 //
 //____________________________________________________________________________
@@ -435,9 +419,7 @@ Action & Block::action (const Apoli & poli, Action & a)
       b .dagger ();
       z *= monodagger .am_coeff;
     }
-    else {
-      b = action (mono, b);
-    }
+    else b = action (mono, b);
     a .add (z, b);
   }
   a .release ();
@@ -454,99 +436,48 @@ void Block::actionclear (size_t begin, size_t end)
   for (size_t n = begin; n < end; n++)  b_action [n] .clear ();
 }
 //
-//______________________________________________________________________SORTING
-template <typename T>
-void quickSort(T *array, size_t left, size_t right)
-{
-    size_t l = left;
-    size_t r = right - 1;
-    size_t size = right - left;
-
-    if (size > 1) {
-        T pivot = array[rand() % size + l];
-
-        while (l < r) {
-            while (array[r] > pivot && r > l) {
-                r--;
-            }
-
-            while (array[l] < pivot && l <= r) {
-                l++;
-            }
-
-            if (l < r) {
-                std::swap(array[l], array[r]);
-                l++;
-            }
-        }
-
-        quickSort(array, left, l);
-        quickSort(array, r, right);
-    }
-}
-//
 //____________________________________________________________________________
-void Block::add_states	(const Qnumber & q, size_t states, long fb, bool qok)
+void Block::add_states	(const Qnumber & q, size_t states, long fb)
 {
   //
   //	Add to block a set of states with common quantum numbers q.
-  //	They are accumulated to Qspace b_tensor ignoring the Qnumber
-  //	q and fermi/bose statistic fb. 
+  //	They are insertedand ordered according to quantum numbers, so we 
+  //	must remember the insertion order.
   //
-  //	If qok is true they are inserted and ordered in Qspace b_quantum 
-  //	according to quantum numbers ordering and we must remember the 
-  //	insertion point in tensorsub
-  //
-  //	XXX I think tensorsub is not needed
-  //
-  size_t order, i, sub, j;
+  size_t order, i;
   size_t oldstates = b_tensor .states ();
-  size_t newstates = oldstates + states;
-  b_tensororder .resize (newstates);
-  b_tensorsub   .resize (newstates);
+  b_states	   = oldstates + states;
+  b_tensororder .resize (b_states);
+  b_tensorsub   .resize (b_states);
   //
-  //	Acuumulate states in b_tensor
+  //	Add states to b_tensor quantum space and get insertion position
   //
-  order = b_tensor .add_space (q, states, fb);
+  order = b_tensor .add_states (q, states, fb);
   //
-  //	Check if we need insertion in b_quantum
+  //	Remember insertion ordering to allow a correct building of 
+  //	Block actions from actions on Block sublattices.
+  //	The ordering is remembered in the vector b_tensororder and 
+  //	the corresponding subspace in the vector b_tensorsub:
   //
-  if (qok) {
-    b_states	   += states;
-    b_tensorsub    .resize (b_states);
-    b_quantumsub   .resize (b_states);
-    //
-    //	Add states to b_quantum quantum space and get insertion position
-    //
-    order = b_quantum .add_states (q, states, fb);
-    //
-    //	Remember insertion ordering to allow a correct building of 
-    //	Block actions from actions on Block sublattices.
-    //	The ordering is remembered in the vector b_tensororder and 
-    //	the corresponding subspace in the vector b_tensorsub:
-    //
-    //		b_tensororder [entry order] = new order
-    //		b_quantumsub  [new order]   = b_quantum subspace index
-    //
-    for (i=0; i < oldstates; i++) 
-      if (b_tensororder [i] >= order) b_tensororder [i] += states;
-    //
-    //	Update subspace for every state
-    //
-    for (sub = 1; sub < b_quantum .subspaces (); sub++) {
-      j  = b_quantum .offset (sub);
-      for (i = 0; i < b_quantum .states (sub); i++) b_quantumsub [j++] = sub;
-    }
-  }
-  sub = b_tensor .subspaces () - 1;
-  for (i = oldstates; i < newstates; i++, order++) {
-    b_tensororder [i] = order;
-    b_tensorsub   [i] = sub;
+  //		b_tensororder [entry order] = new order
+  //		b_tensorsub   [new order]   = b_tensor subspace index
+  //
+  for (i=0; i < oldstates; i++) 
+    if (b_tensororder [i] >= order) b_tensororder [i] += states;
+  for (i = oldstates; i < b_states; i++, order++) b_tensororder [i] = order;
+  //
+  //	Compute subspace for every state
+  //
+  for (size_t sub = 1; sub < b_tensor .subspaces (); sub++) {
+    order = b_tensor .offset (sub);
+    for (i = 0; i < b_tensor .states (sub); i++) b_tensorsub [order++] = sub;
   }
   //
   //	b_tensor is never defined or changed outside here, while b_quantum
   //	can change according to base transformations
   //
+  b_quantum    = b_tensor;
+  b_quantumsub = b_tensorsub;
 }
 //
 //____________________________________________________________________________
@@ -574,23 +505,12 @@ Action &  Block::base (Action & b)
   }
   else {
     //
-    //	If base states are not defined Qspace b_quantum is an ordered 
-    //	selection of states of b_tensor. 
+    //	If base states are not defined spaces b_quantum and b_tensor
+    //	are the same and states are implicitly represented by identity 
+    //	matrix
     //
-    //	Bulld and return an Action representing the selection:
-    //	< l p | B | m > = < l p | m >   
-    //
-    size_t nt = b_tensor .states ();
-    size_t nq = b_quantum .states ();
-    complex<double> * mb = new complex<double> [nt * nq];
-    memset (mb, 0, nt * nq * sizeof (complex<double>));
-    for (size_t i = 0; i < nt; i++) {
-      size_t order = b_tensororder [i];
-      if (order < nq)  mb [i + order * nt] = 1.0;
-    }
-    b = Action (b_tensor, b_quantum);
-    b .compress (mb);
-    delete [] mb;
+    b = Action (b_tensor, 1.0);
+    b .scalaridentity (1.0);
     return b;
   }
 }
@@ -599,8 +519,7 @@ Action &  Block::base (Action & b)
 Action & Block::basereflected ()
 {
   //
-  //	Returns (and builds) Action representing projection of q_quantum 
-  //	states in reflected b_tensor states
+  //	Returns (and builds) Action represent
   //
   return basereflected (action (idop_base, 1));
 }
@@ -609,16 +528,11 @@ Action & Block::basereflected ()
 Action & Block::basereflected (Action & reflected) 
 {
   //
-  //	Builds Action representing projection of b_quantum states 
-  //	over reflected b_tensor states.
-  //	Assuming b_quantum states j expressed in b_tensor states (l,p):   
-  //		
-  //		| j> = \sum | l p> <l p | j>
+  //	Builds Action representing reflected b_tensor states in the 
+  //	b_quantum base
   //
-  //    We ccompute the proiections components < p l | j > and return
-  //	a corresponding Action
-  //	
-  //		<p l |R| j>  = < p l | j> 
+  //		R [l p;j] = <p l |j>	(l,p) states in b_tensor, 
+  //					j = state in b_quantum
   //
   if (action (idop_base, 1) .storage ()) {
     //
@@ -630,89 +544,153 @@ Action & Block::basereflected (Action & reflected)
   //
   //	Action must be built
   //
-  if (b_sites <= 2) {
+  if (b_sites == 1) {
     //
-    //	For 1-site and 2-sites Blocks we don't have an effective tensor space.
+    //	For 1-site Block we don't have an effective tensor space
     //	The reflection is not effective and the matrix is simply the 
-    //	original base.
-    //
-    return base ();
+    //	identity matrix 
+    //	
+    reflected = Action (b_tensor, 1.0);
+    reflected .scalaridentity (1.0);
+    return reflected;
   }
   //
-  //	The coefficients are recursively built from parent Block 
-  //	component.
+  //	The matrix is recursively built from left Block component.
   //
-  //	For n sites we have (sums are over repeated indexes and p, q are 
-  //	one site blocks):
+  //	For k sites we have (sums are over repeated indexes):
   //
-  //	| a_n> = \sum | a_{n-1} p> <a_{n-1} p | l_k>
-  //	
-  //	< p a_{n-1} | a_n> = \sum <a_{n-1} | a_{n-2} q>
-  //				  <p a_{n-2} | b_{n-1}> <b_{n-1} q | a_n>  
+  //	|l_k> = \sum |l_{k-1} p_k> <l_{k-1} p_k |l_k>
   //
-  //	<a_{n-1} p |R| a_n> = \sum <a_{n-1}| a_{n-2} q> 
-  //			<a_{n-2} p |R| b_{n-1}> <b_{n-1} q | a_n>
+  //	<p_k l_{k-1} | l_k> = 
+  //	  \sum <l_{k-1}|l_{k_2} p> <p_k l_{k_2}| l_{k-1}'> <l_{k-1}' p| l_k>
   //
-  size_t  p_states  = b_parent [1] .states ();
+  //	Id est:
   //
-  Action  Brgt = base ();
-  Space   p_tensor (b_parent [1] .quantum (), b_parent [b_sites-1] .quantum ());
-  reflected = Action (p_tensor, b_quantum);
+  //	R_k [l_{k-1} p_k; l_k]  = \sum U_{k-1}^dagger [l_{k-1}; l_{k-2} p] 
+  //	         * R_{k-1} [l_{k-2} p_k; m_{k-1}] * U_k [m_{k-1} p; l_k]
   //
-  //	<p l | n> = \sum <l | m q> <p m |ll> <ll q| n>
+  //	With:
+  //		U_k [l_{k-1} p; l_k] = <l_{k-1} p | l_k>
   //
-  size_t l_states  = b_parent [b_sites-1] .states ();
-  size_t m_states  = b_parent [b_sites-2] .states ();
-  size_t n_states =  b_states;
-  if (l_states > n_states) n_states = l_states;
-  if (m_states > n_states) n_states = m_states;
-  size_t np_states = n_states * p_states;
-  size_t lp_states = l_states * p_states;
-  size_t lm_states = l_states * m_states;
-  size_t mp_states = m_states * p_states;
+  Block  & l  = b_parent [b_lft];
+  Block  & p  = b_parent [1];
+  size_t lstates = l .states ();
+  size_t pstates = p .states ();
   //
-  complex<double> * mm = new complex<double> [np_states * np_states];
-  complex<double> * mr = new complex<double> [np_states * n_states];
-  complex<double> * mb = new complex<double> [np_states * n_states];
+  Action ul, rl, ur;
+  ul = l .base  ();
+  ul .dagger ();
+  rl = l .basereflected ();
+  ur = base ();
   //
-  size_t n, l, ll, m, p, q;
-  Action b = b_parent [b_sites-1] .base ();
-  b .dagger ();
-  Action r = b_parent [b_sites-1] .basereflected ();
-  b .expand (mb);
-  r .expand (mr);
-  complex<double> s;
+  //	Setup reflected Ablocks
   //
-  //	<p l |M| ll q> = \sum <l |m q> <p m|R| ll>
+  const Space & lft = ul .range  ();
+  const Space & rgt = ur .domain ();
   //
-  for (q = 0; q < p_states; q++) 
-    for (ll = 0; ll < l_states; ll++) 
-      for (l = 0; l < l_states; l++) 
-	for (p = 0; p < p_states; p++) {
-	  s = 0.0;
-	  for (m = 0; m < m_states; m++) 
-	    s += mb [l + m*l_states + q*lm_states] 
-	      * mr [p + m*p_states + ll*mp_states];
-	  mm [p + l*p_states + ll*lp_states + q*l_states*lp_states] = s;
-	}
+  size_t  nl  = b_tensor  .subspaces ();
+  size_t  nr  = b_quantum .subspaces ();
+  Storage bstorage (nl * nr * sizeof (Ablock));
+  Ablock * b = (Ablock *) bstorage .storage ();
+  size_t rsize, nblocks, n;
+  rsize = minasize ();
   //
-  b = base ();
-  b .expand (mb);
+  //	contraction and pseudo contracion
   //
-  //	<p l | n> = \sum <p l |M| ll q> <ll q| n>
+  Action id (lft, 1.0);
+  id .scalaridentity (1.0);
   //
-  for (n = 0; n < n_states; n++) 
-    for (l = 0; l < lp_states; l++) {
-      s = 0.0;
-      for (ll = 0; ll < lp_states; ll++)
-	s += mm [l + ll*lp_states] * mb [ll + n*lp_states];
-      mr [l + n*lp_states] = s;
+  //	rc [q]   [l'; r] = <l' q| r>
+  //	lc [q p] [l; l'] = <l| m q> <p m| l'> (summed over m)
+  //
+  Aarray rc, lc;
+  contraction    (id, 0, pstates, ur, rc);
+  l .contraction (ul, pstates, pstates, rl, lc);
+  //
+  for (size_t p = 0; p < pstates; p++) {
+    Action r (lft, rgt);
+    for (size_t q = 0; q < pstates; q++) {
+      lc [q + p * pstates] *= rc [q];
+      r  += lc [q + p * pstates];
     }
-  reflected .compress (mr);
-  delete [] mb;
-  delete [] mr;
-  delete [] mm;
-  return reflected;	
+    //
+    // r [i; j] = <p i| j> = R_k [i p; j]
+    //
+    Ablock * br = r .block ();
+    for (n = 0; n < r .blocks (); n++) {
+      size_t i  = br [n] .ab_range;
+      size_t j  = br [n] .ab_domain;
+      size_t ro = br [n] .ab_roffset;
+      size_t io = br [n] .ab_ioffset;
+      //
+      i  = lft .offset      (i);
+      i  = b_tensororder    [i + p * lstates];
+      i  = b_tensorsub      [i];
+      //
+      Ablock & bb = b [i + j * nl];
+      bb .ab_range  = i; 
+      bb .ab_domain = j;
+      size_t ms = b_tensor .states (i) * b_quantum .states (j);
+      if ((bb .ab_roffset == 0) && ro) {
+	bb .ab_roffset = rsize;
+	rsize += ms;
+      }
+      if ((bb .ab_ioffset == 0) && io) {
+	bb .ab_ioffset = rsize;
+	rsize += ms;
+      }
+     }
+    lc [p] << r;
+   }
+  //
+  for (n = 0, nblocks = 0; n < nl * nr; n++) 
+    if (b [n] .ab_roffset || b [n] .ab_ioffset) nblocks++;
+  //
+  //	Build resulting Action
+  //
+  reflected = Action (b_tensor, b_quantum);
+  reflected .size    (rsize);
+  reflected .storage (rsize);
+  reflected .blocks  (nblocks);
+  reflected .block   (nblocks);
+  //
+  double * mr = reflected .storage ();
+  Ablock * br = reflected .block   ();
+  for (n = 0, nblocks = 0; n < nl * nr; n++) 
+    if (b [n] .ab_roffset || b [n] .ab_ioffset) br [nblocks++] = b [n];
+  //
+  for (size_t p = 0; p < pstates; p++) {
+    Ablock * ba = lc [p] .block   ();
+    double * ma = lc [p] .storage ();
+    for (n = 0; n < lc [p] .blocks (); n++) {
+      size_t ra = ba [n] .ab_roffset;
+      size_t ia = ba [n] .ab_ioffset;
+      size_t ls = ba [n] .ab_range;
+      size_t rs = ba [n] .ab_domain;
+      size_t w  = rgt .states (rs);
+      size_t lh = lft .states (ls);
+      size_t lo = lft .offset (ls);
+      lo  = b_tensororder [lo + p * lstates];
+      ls  = b_tensorsub   [lo];
+      lo -= b_tensor .offset (ls);
+      size_t h    = b_tensor .states (ls);
+      Ablock & bb = b [ls + rs * nl];
+      size_t roff = bb .ab_roffset + lo;
+      size_t ioff = bb .ab_ioffset + lo;
+      if (ra) 
+	for (size_t j = 0; j < w; j++, roff += h)
+	  for (size_t i = 0; i < lh; i++, ra++) mr [roff + i] += ma [ra];
+      if (ia) 
+	for (size_t j = 0; j < w; j++, ioff += h)
+	  for (size_t i = 0; i < lh; i++, ia++) mr [ioff + i] += ma [ia];
+    }
+  }
+  //	
+  //	Check statistic (like identity)
+  //
+  reflected .statistic (1);
+  reflected .scalar (1.0);
+  return reflected;
 }
 //
 //____________________________________________________________________________
@@ -1182,9 +1160,40 @@ void Block::release ()
   for (size_t n = 0; n < b_action .size (); n++) b_action [n] .release ();
 }
 //
+//______________________________________________________________________SORTING
+template <typename T>
+void quickSort(T *array, size_t left, size_t right)
+{
+    size_t l = left;
+    size_t r = right - 1;
+    size_t size = right - left;
+
+    if (size > 1) {
+        T pivot = array[rand() % size + l];
+
+        while (l < r) {
+            while (array[r] > pivot && r > l) {
+                r--;
+            }
+
+            while (array[l] < pivot && l <= r) {
+                l++;
+            }
+
+            if (l < r) {
+                std::swap(array[l], array[r]);
+                l++;
+            }
+        }
+
+        quickSort(array, left, l);
+        quickSort(array, r, right);
+    }
+}
+//
 //____________________________________________________________________________
 void Block::select_states (const Action & density, size_t min, size_t max, 
-			   double maxerror)
+			   double n_cut)
 {
   //
   //	Select states for the block as the eigenvectors of given
@@ -1197,15 +1206,10 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   //	jump satisfying the limits (I don't know if this is the optimal 
   //	way but it helps).
   //
-  
-
-  
-  double n_cut = maxerror;
   if (b_states <= 50) return;
-  
   size_t   i, j, nb, sub, offset, dimension;
-  size_t   extra =  max + density .blocks ();
-  if (extra >= b_states) extra = (max + b_states)/2; 
+  //size_t   extra =  max + density .blocks ();
+  //if (extra >= b_states) extra = (max + b_states)/2; 
   //
   //	Do yo want to show density matrix?
   //
@@ -1216,7 +1220,7 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   //	Temporary storage area
   //
   size_t ss = 2 * b_states * sizeof (double);
-  size_t sw = 2 * subspaces () * sizeof (long);
+  size_t sw = 2 * b_tensor .subspaces () * sizeof (long);
   size_t eig_ord = b_states * sizeof (double);
   Storage  mem (ss);
   Storage  mw  (sw);
@@ -1225,18 +1229,20 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   double * offd   = eigen  + b_states;
   //
   //    We add the possibility of choice the maximum error insted the 
-  //    max and min number of states. 
-  //	eig_ord is the vector where we order the eigenvalues.
+  //    max and min number of states. eig_ord is the vector where we 
+  //    order the eigenvalues.
   //
   double * eigord = (double *) m_ord .storage ();
   long   * weight = (long *)   mw  .storage ();
-  long   * occ    = weight + subspaces ();
-  for (i = 0; i < 2 * b_states; i++) eigen [i] = 0.0;
+  long   * occ    = weight + b_tensor .subspaces ();
+  for (i = 0; i < 2 * b_states; ++i) eigen [i] = 0.0;
   //
   for (nb = 0; nb < density .blocks (); nb++) {
     //	
     //	A simple check if density is block diagonal
     //
+    // cout  << "BLOCK " << nb << " " << b [nb] .ab_domain << " "
+	//   << b [nb] .ab_range << endl;
     if (b [nb] .ab_domain != b [nb] .ab_range) {
       cout << "Not block diagonal density matrix! " 
 	   << "block " << nb << " " << b [nb] .ab_domain << " "
@@ -1266,29 +1272,32 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   size_t selected = 0;
   double emax = -2.0;
   double trace = 0.0;
-  for (i = 0; i < b_states; i++)  {
+  for (i = 0; i < b_states; ++i)  {
     //
     //	cleanup 
     //
-    if (eigen [i] < 10.0 * eps) eigen [i] = 0.0;
+    if (eigen [i] < eps*1.e-6) eigen [i] = 0.0;
     trace += eigen [i];
   }
-  for (i = 0, j = b_states; i < b_states; i++) {
+  for (i = 0, j = b_states; i < b_states; ++i) {
     //
-    //	normalize and find highest eigenvalue
+    //	normalize and find highest eigenvalues
     //
     eigen [i] /= trace;
-    offd  [i] = 0.0;
-    eigord[i] = eigen[i];
+    //	cout << "vecchi:   " << eigen[i] << endl;    
+    offd [i] = 0.0;
+	eigord[i]=eigen[i];
     if (eigen [i] > emax) {
       emax = eigen [i];
       j = i;
     }
   }
-  //
-  //	Use offd as a mark for eigenvalues selected
-  //
-  if (j < b_states) offd [j] = ++selected;
+
+    //	Use offd as a mark for eigenvalues selected
+    //
+    if (j < b_states) offd [j] = ++selected;
+    //
+    
   //
   //        Here we order the eigenvalues
   //
@@ -1306,63 +1315,58 @@ void Block::select_states (const Action & density, size_t min, size_t max,
 //
 //	SORTING
 //
-	quickSort(eigord, 0, b_states);
-    
-  if (n_cut > 0 && n_cut < 1){
+
+    quickSort(eigord, 0, b_states);
+/*		for (i = b_states-20; i<b_states; ++i) 
+			{
+	cout << "autovalore" << "   " << eigord[i] << "   " << i << endl;		
+			}*/
+   
+    //
+	//		Set variable number of states  
+	//
+	
+if (n_cut > 0 && n_cut < 1){
 
     //    Sum of the eigenvalues
-/*
+    
     double sum = 0;
-    size_t cut_states_number = 5;
-    for ( i = 0; i < b_states; i++) {
-      sum += eigord[i];      
-      if(sum > 1.0 - n_cut) {
-	cut_states_number = i + 5;
-	break;
-      }
-    }    
-*/    
-	double sum = 0;
     int cut_states_number = 0;    
+
     for ( i = b_states-1; i > 0; i--) {
       sum += eigord[i];   
 	  cut_states_number += 1;
+//              cout << "Ciao gattone = " << 1-n_cut << "  " << sum << "  " << eigord[i] << "  " << i << endl;   
       if(sum > 1 - n_cut) {
 		break;
       }
     }
+       
+	if (cut_states_number > min && cut_states_number < max){    
+        min = cut_states_number;
+        max = cut_states_number;
+ 	}            
+    
+    if (cut_states_number < min) max = min ;
+    if (cut_states_number > max) min = max ;
     
     
-    if (cut_states_number > min && cut_states_number < max){    
-      min = cut_states_number;
-      max = cut_states_number;
-    }            
-    if (cut_states_number < min) max = min;
-    if (cut_states_number > max) min = max;
-    //cout << "States -> Cut / Min / Max = " << cut_states_number << "  " 
-	// << min << "  " << max << endl;
-  }
+//        cout << "n_cut = " << setprecision(9) << n_cut << endl;
+    cout << "States -> Cut / Min / Max = " << cut_states_number << "  " << min << "  " << max << endl;
+//        cout << "precision = " << setprecision(9) << sum << endl;
+};
 
-  
- 	//	Print Entanglement SPECTRUM3
 
-//   for ( i=0; i<15; i++) {
-//   	cout << "autovalore  " << i << "  " << eigord[i] << endl;
-//   }
-  
-  //
   double discard = -1.;
   double jump  = -1.0;
   double vcut  = -1.0;
   double vlast = -1.0;
   size_t cut  = b_states;
-  size_t minselected = 1;
-  size_t maxselected = b_states;
-  double error = 1.0;
+  size_t minselected = selected;
+  size_t maxselected = 0;
   while (selected < b_states) {
-    error -= emax;
     double dmax = -1;
-    for (i = 0, j = b_states; i < b_states; i++) {
+    for (i = 0, j = b_states; i < b_states; ++i) {
       if (offd  [i] > 0.0) continue;
       if (eigen [i] > dmax) {
 	dmax = eigen [i];
@@ -1394,16 +1398,10 @@ void Block::select_states (const Action & density, size_t min, size_t max,
       //  If the selection is inside the range (borders excluded)
       //  we record the position (updating it for highest jump)
       //
-      if ((min < selected) && (selected < max)) {
-	vcut = vlast;
-	//
-	//	if truncation error is good skip other jumps
-	//
-	if (error < maxerror) break;
-      }
+      if ((min < selected) && (selected < max)) vcut = vlast;
       else if ((selected == max) && (delta > eps)) {
 	//
-	//  The jump is a true jump at the upper border. Accept
+	//  The jump is a true high jump at the upper border. Accept
 	//  it (and skip other jumps).
 	//
 	vcut = vlast;
@@ -1412,7 +1410,7 @@ void Block::select_states (const Action & density, size_t min, size_t max,
       else if (selected > max) {
 	//
 	//  The jump is in a position out of borders. Accept if last
-	//  jump was exactly on the lower border (this is signaled by the
+	//  jump was exactly on the borders (this is signaled by the
 	//  initialization vcut < 0) and the jump is no too far away
 	//  from the borders. Skip any other jump.
 	//
@@ -1434,15 +1432,17 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   //
   //	Use offd to mark chosen eigenvalues
   //
-  cut = 0;
-  for (i = 0; i < b_states; i++) {
-    offd [i] = 0.0;
-    if (eigen [i] > vcut) {
-      offd [i] = 1.0;
-      cut++;
+  if (min < max) {
+    cut = 0;
+    for (i = 0; i < b_states; ++i) {
+      offd [i] = 0.0;
+      if (eigen [i] > vcut) {
+	offd [i] = 1.0;
+	cut++;
+      }
     }
+    minselected = cut;
   }
-  //minselected = cut;
   if (cut < min) {
     //
     //	Simple comparison with vcut gives a number lower than requested 
@@ -1453,11 +1453,11 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     long qHare = (double (b_states - cut)) / ((double) (min - cut));
     long socc;
     long maxw = 0;
-    for (sub = 1; sub < subspaces (); sub++) {
-      offset    = b_quantum .offset (sub);
-      dimension = b_quantum .states (sub);
+    for (sub = 1; sub < b_tensor .subspaces (); ++sub) {
+      offset    = b_tensor .offset (sub);
+      dimension = b_tensor .states (sub);
       socc = 0;
-      for (i = offset; i < offset + dimension; i++) if (offd [i]) socc++;
+      for (i = offset; i < offset + dimension; ++i) if (offd [i]) socc++;
       weight [sub] = dimension - socc;
       if (weight [sub] > maxw) maxw = weight [sub];
       occ    [sub] = socc;
@@ -1469,8 +1469,8 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     while (cut < min) {
       //
       socc = 0;
-      for (sub = 1; sub < subspaces (); sub++) {
-	dimension = b_quantum .states (sub);
+      for (sub = 1; sub < b_tensor .subspaces (); ++sub) {
+	dimension = b_tensor .states (sub);
 	if ((weight [sub] == maxw) && (occ [sub] < (long) dimension)) {
 	  occ    [sub] += 1;
 	  weight [sub] -= qHare;
@@ -1485,9 +1485,9 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     }
     //
     vcut = 0.0;
-    for (sub = 1; sub < subspaces (); sub++) {
-      offset    = b_quantum .offset (sub);
-      dimension = b_quantum .states (sub);
+    for (sub = 1; sub < b_tensor .subspaces (); ++sub) {
+      offset    = b_tensor .offset (sub);
+      dimension = b_tensor .states (sub);
       vlast = 0.0;
       for (i = offset, socc = 0; socc < occ [sub]; i++, socc++) 
 	offd [i] = 1.0;
@@ -1520,13 +1520,13 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   }
   cut = 0;
   discard = 0.0;
-  for (sub = 1; sub < subspaces (); sub++) {
+  for (sub = 1; sub < b_tensor .subspaces (); ++sub) {
     ss = 0;
-    offset    = b_quantum .offset (sub);
-    dimension = b_quantum .states (sub);
+    offset    = b_tensor .offset (sub);
+    dimension = b_tensor .states (sub);
     double upper = 0.0;
     double lower = 0.0;
-    for (i = offset; i < offset + dimension; i++) 
+    for (i = offset; i < offset + dimension; ++i) 
       if (offd [i]) {
 	cut++;
 	ss++;
@@ -1536,7 +1536,7 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     //
     if (show_states) { 
       cout << " Space " << setw (20) << left 
-	   << b_quantum .number (sub) .str () 
+	   << b_tensor .number (sub) .str () 
 	   << setw (5) << right << ss << "/" << setw (5) << left  
 	   << dimension;
       if (ss == 0) cout << setw (26) << " ";
@@ -1559,8 +1559,8 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     //
     if (ss) {
       nsub++;
-      select .add_states (b_quantum .number (sub), ss,
-			  b_quantum .statistic (sub));
+      select .add_states (b_tensor .number (sub), ss, 
+			  b_tensor .statistic (sub));
       for (nb = 0; nb < density .blocks (); nb++) 
 	if (b [nb] .ab_range == sub) break;
       Ablock bb;      
@@ -1591,10 +1591,21 @@ void Block::select_states (const Action & density, size_t min, size_t max,
 	 << setw (14) << setprecision (6) << right << scientific
 	 << discard / trace << endl;
   truncation = discard /trace;
+  b_states  = cut;
+  b_quantum = select;
+  //
+  //	Compute subspace for every state
+  //
+  for (sub = 1; sub < subspaces (); ++sub) {
+    size_t order  = b_quantum .offset (sub);
+    for (i = 0; i < b_quantum .states (sub); ++i) 
+      b_quantumsub [order++] = sub;
+  }
   //
   //	Define Action representing selected states;
   //
-  Action  matrix = Action (b_quantum, select);
+  Action & matrix = action (idop_base, 0);
+  matrix = Action (b_tensor, select);
   matrix .size    (msize);
   matrix .storage (msize);
   matrix .blocks  (blk .size ());
@@ -1608,13 +1619,13 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     mb [nsub] = blk [nsub];
     i  = mb [nsub] .ab_range;
     j  = mb [nsub] .ab_domain;
-    ss = b_quantum .states (i) * select .states (j) * sizeof (double);
+    ss = b_quantum .states (j) * b_tensor .states (i) * sizeof (double);
     for (nb = 0; nb < density .blocks (); nb++) 
       if (b [nb] .ab_range == i) break;
     if (nb == density .blocks ()) {
       memset (mn + mb [nsub] .ab_roffset, 0, ss);
-      dimension = b_quantum .states (i);
-      for (size_t k = 0; k < select .states (j) * dimension; 
+      dimension = b_tensor .states (i);
+      for (size_t k = 0; k < b_quantum .states (j) * dimension; 
 	   k += (dimension + 1))  mn [mb [nsub] .ab_roffset + k] = 1.0; 
     }
     else {
@@ -1625,19 +1636,6 @@ void Block::select_states (const Action & density, size_t min, size_t max,
     }
   }
   matrix .scalar (1.0);
-  b_states  = select .states ();
-  b_quantum = select;
-  //
-  //	Compute subspace for every state
-  //
-  for (sub = 1; sub < subspaces (); sub++) {
-    size_t order  = b_quantum .offset (sub);
-    for (i = 0; i < b_quantum .states (sub); i++) 
-      b_quantumsub [order++] = sub;
-  }
-  Action & base = action (idop_base, 0);
-  if (base .storage ()) 	base *= matrix;
-  else				base << matrix;
   // Action & reflected = action (idop_base, 1);
   // basereflected (reflected);
   //	
@@ -1646,15 +1644,12 @@ void Block::select_states (const Action & density, size_t min, size_t max,
   b_optimized .resize (subspaces ());
   for (nsub = 0; nsub < subspaces (); nsub++) b_optimized [nsub] = 0;
   //
-  //	Update yet defined Action's
+  //	Update defined Action's
   //
   Action mdagger = matrix;
   mdagger .dagger ();
   for (size_t id = 0; id < b_action .size (); id++) {
-    if (id == idop_base) {
-      action (id, 1) = Action ();
-      continue;
-    }
+    if (id == idop_base) continue;
     for (size_t index = 0; index < b_action [id] .size (); index++) {
       Action & op = action (id, index);
       if (op .isscalar ()) {
@@ -1747,144 +1742,6 @@ void Block::tensor (Action & t, const Action & lop, const Action & rop)
   //	Build Action t as tensor product of two Action's lop and rop
   //	belonging to left and right Block components
   //
-  if (lop .isnull () || rop .isnull ()) {
-    //
-    //	null tensor product
-    //
-    t = Action (b_quantum, b_quantum);
-    return;
-  }
-  if (lop .isscalar () && rop .isscalar ()) {
-    //
-    //	Two scalars product
-    //
-    complex<double> zl = lop .scalar ();
-    complex<double> zr = rop .scalar ();
-    t = Action (b_quantum, zl * zr);
-    return;
-  }
-  if (lop .isscalar ()) {
-    //
-    //	lop is a scalar. Build identity action times the scalar
-    //  and use it instead of lop
-    //
-    Action a (lop);
-    a .scalaridentity (a .scalar ());
-    tensor (t, a, rop);
-    return;
-  }
-  if (rop .isscalar ()) {
-    //
-    //	rop is a scalar. Build identity action times the scalar    
-    //	and use it instead of rop
-    //
-    Action a (rop);
-    a .scalaridentity (a .scalar ());
-    tensor (t, lop, a);
-    return;
-  }
-  t = Action (b_tensor, b_tensor);
-  size_t t_states = b_tensor .states ();
-  size_t l_states = b_parent [b_lft] .states ();
-  complex<double> * mt = new complex<double> [t_states * t_states];
-  memset (mt, 0, t_states * t_states * sizeof (complex<double>));
-  Ablock * lb = lop .block ();
-  Ablock * rb = rop .block ();
-  double * ml = lop .storage ();
-  double * mr = rop .storage ();
-  size_t bl, br, blro, brro, blio, brio, il, jl, ir, jr, ii, jj,
-    ilo, jlo, iro, jro, lh, lw, rh, rw;
-  complex<double> zi (0.0, 1.0);
-  for (br = 0; br < rop .blocks (); br++) {
-    brro = rb [br] .ab_roffset;
-    brio = rb [br] .ab_ioffset;
-    iro  = rb [br] .ab_range;
-    jro  = rb [br] .ab_domain;
-    long fr = rop .domain () .statistic (jro) * rop .range () .statistic (iro);
-    rh  = rop .height (iro);
-    rw  = rop .width  (jro);
-    iro = rop .range ()  .offset (iro);
-    jro = rop .domain () .offset (jro);
-    for (bl = 0; bl < lop .blocks (); bl++) {
-      blro = lb [bl] .ab_roffset;
-      blio = lb [bl] .ab_ioffset;
-      ilo  = lb [bl] .ab_range;
-      jlo  = lb [bl] .ab_domain;
-      long fl = lop .domain () .statistic (jlo);
-      double fermi = 1.0;
-      if ((fl < 0) && (fr < 0)) fermi = -1.0;
-      lh = lop .height (ilo);
-      lw = lop .width  (jlo);
-      ilo = lop .range ()  .offset (ilo);
-      jlo = lop .domain () .offset (jlo);
-      //
-      if (blro && brro) //	real * real
-	for (jr = 0; jr < rw; jr++)
-	  for (jl = 0; jl < lw; jl++) {
-	    jj = jlo + jl + (jro + jr) * l_states;
-	    for (ir = 0; ir < rh; ir++)
-	      for (il = 0; il < lh; il++) {
-		ii = ilo + il + (iro + ir) * l_states;
-		mt [ii + jj * t_states] += fermi *
-		  ml [blro + il + jl * lh] * mr [brro + ir + jr * rh];
-	      }
-	  }
-      //
-      if (blio && brio) //	imag * imag
-	for (jr = 0; jr < rw; jr++)
-	  for (jl = 0; jl < lw; jl++) {
-	    jj = jlo + jl + (jro + jr) * l_states;
-	    for (ir = 0; ir < rh; ir++)
-	      for (il = 0; il < lh; il++) {
-		ii = ilo + il + (iro + ir) * l_states;
-		mt [ii + jj * t_states] -= fermi *
-		  ml [blio + il + jl * lh] * mr [brio + ir + jr * rh];
-	      }
-	  }
-      //
-      if (blio && brro) //	imag * real
-	for (jr = 0; jr < rw; jr++)
-	  for (jl = 0; jl < lw; jl++) {
-	    jj = jlo + jl + (jro + jr) * l_states;
-	    for (ir = 0; ir < rh; ir++)
-	      for (il = 0; il < lh; il++) {
-		ii = ilo + il + (iro + ir) * l_states;
-		mt [ii + jj * t_states] += zi * fermi *
-		  ml [blio + il + jl * lh] * mr [brro + ir + jr * rh];
-	      }
-	  }
-      //
-      if (blro && brio) //	real * imag
-	for (jr = 0; jr < rw; jr++)
-	  for (jl = 0; jl < lw; jl++) {
-	    jj = jlo + jl + (jro + jr) * l_states;
-	    for (ir = 0; ir < rh; ir++)
-	      for (il = 0; il < lh; il++) {
-		ii = ilo + il + (iro + ir) * l_states;
-		mt [ii + jj * t_states] += zi * fermi *
-		  ml [blro + il + jl * lh] * mr [brio + ir + jr * rh];
-	      }
-	  }      
-    }
-  }
-  t .compress (mt);
-  delete [] mt;
-  Action b = base ();
-  t *= b;
-  b .dagger ();
-  b *= t;
-  t << b;
-  t .release ();
-}
-//
-//____________________________________________________________________________
-void Block::tensorold (Action & t, const Action & lop, const Action & rop)
-{
-  //
-  //	Build Action t as tensor product of two Action's lop and rop
-  //	belonging to left and right Block components
-  //
-  cout << "tensor ";
   if (lop .isnull () || rop .isnull ()) {
     //
     //	null tensor product

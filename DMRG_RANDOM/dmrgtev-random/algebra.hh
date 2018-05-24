@@ -45,8 +45,7 @@ struct	Amono
   inline size_t 	 order () const;		       // [algebra.hh]
   inline size_t 	 size  () const;		       // [algebra.hh]
   //
-  inline Afactor & operator [] (size_t);	       	       // [algebra.hh]
-  inline const Afactor & operator [] (size_t) const;           // [algebra.hh]
+  inline const Afactor & operator [] (size_t) const;	       // [algebra.hh]
   //
   inline bool operator == (const Amono &) const;	       // [algebra.hh]
   inline bool operator != (const Amono &) const;	       // [algebra.hh]
@@ -78,7 +77,7 @@ struct Apoli
   //
   inline size_t size () const;				       // [algebra.hh]
   //
-  inline const Amono & operator [] (size_t) const;    	       // [algebra.hh]
+  inline const Amono & operator [] (size_t) const;     	       // [algebra.hh]
   //
   inline bool operator == (const Apoli &) const;	       // [algebra.hh]
   //
@@ -206,15 +205,6 @@ inline complex<double> Amono::coeff () const
 }
 //
 //____________________________________________________________________________
-inline Afactor & Amono::operator [] (size_t index)
-{
-  //
-  //	Get index-th Afactor
-  //
-  return am_factor [index];
-}
-//
-//____________________________________________________________________________
 inline const Afactor & Amono::operator [] (size_t index) const
 {
   //
@@ -230,7 +220,7 @@ inline bool Amono::operator == (const Amono & other) const
   //	Compare Amono's factors
   //
   if (order () != other .order ()) return false;
-  for (size_t m = 0; m < order (); m++) 
+  for (size_t m = 0; m < order (); ++m) 
     if (am_factor [m] != other .am_factor [m]) return false;
   return true;
 }
@@ -253,7 +243,7 @@ inline bool Amono::operator >  (const Amono & other) const
   //
   if (order () > other .order ()) return true;
   if (order () < other .order ()) return false;
-  for (size_t m = 0; m < order (); m++) {
+  for (size_t m = 0; m < order (); ++m) {
     if (am_factor [m] > other .am_factor [m]) return true;
     if (am_factor [m] < other .am_factor [m]) return false;
   }
@@ -268,7 +258,7 @@ inline bool Amono::operator <  (const Amono & other) const
   //
   if (order () < other .order ()) return true;
   if (order () > other .order ()) return false;
-  for (size_t m = 0; m < order (); m++) {
+  for (size_t m = 0; m < order (); ++m) {
     if (am_factor [m] < other .am_factor [m]) return true;
     if (am_factor [m] > other .am_factor [m]) return false;
   }
@@ -303,7 +293,7 @@ inline Amono & Amono::operator *= (const Amono & other)
   //	Multiply by a Amono
   //
   am_coeff *= other .am_coeff;
-  for (size_t m = 0; m < other .order (); m++) *this *= other [m];
+  for (size_t m = 0; m < other .order (); ++m) *this *= other [m];
   return *this;
 }
 //
@@ -341,7 +331,7 @@ inline bool Apoli::operator == (const Apoli & other) const
   //	Apoli's comparison
   //
   if (size () != other .size ()) return false;
-  for (size_t m = 0; m < size (); m++) {
+  for (size_t m = 0; m < size (); ++m) {
     if (ap_mono [m] != other [m]) return false;
     if (ap_mono [m] .am_coeff != other [m] .am_coeff) return false;
   }

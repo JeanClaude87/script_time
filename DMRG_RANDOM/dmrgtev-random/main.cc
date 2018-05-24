@@ -10,13 +10,13 @@
 #include <iomanip>
 //
 //============================================================================
-void	bottom_line ();						  	// [main.cc]
-void	dmrg_initialize ();					  	// [dmrg.cc]
-void	dmrg_process ();					  	// [dmrg.cc]
-void	header_line ();						  	// [main.cc]
-void	input_collect (int, char * []);			// [input.cc]
-void	input_process ();		       			// [input.cc]
-void	input_show ();						 	// [input.cc]
+void	bottom_line ();						  // [main.cc]
+void	dmrg_initialize ();					  // [dmrg.cc]
+void	dmrg_process ();					  // [dmrg.cc]
+void	header_line ();						  // [main.cc]
+void	input_collect (int, char * []);				 // [input.cc]
+void	input_process ();		       			 // [input.cc]
+void	input_show ();						 // [input.cc]
 //
 //============================================================================
 static string	header = NAME"-"VERSION" ("HOSTTYPE") "COPYRIGHT;
@@ -27,16 +27,16 @@ static time_t	tend;
 int main (int argc, char * argv [])
 {
   srand48(time(0)*getpid());	// initialising random numbers
-  tstart = time (0);					// starting time
-  atexit (bottom_line);					// print overall statistics on exit
-  ios::sync_with_stdio ();				// syncronize c and c++ i/o
-  setbuf (stdout, 0);					// unbuffered output
-  input_collect (argc, argv);			// collect input
-  header_line ();						// output start
-  input_show ();						// show collected input lines 
-  dmrg_initialize ();					// initialize
-  input_process ();						// parse and process input
-  dmrg_process  ();						// DMRG algorithm
+  tstart = time (0);			// starting time
+  atexit (bottom_line);			// print overall statistics on exit
+  ios::sync_with_stdio ();		// syncronize c and c++ i/o
+  setbuf (stdout, 0);			// unbuffered output
+  input_collect (argc, argv);		// collect input
+  header_line ();			// output start
+  input_show ();			// show collected input lines 
+  dmrg_initialize ();			// initialize
+  input_process ();			// parse and process input
+  dmrg_process  ();			// DMRG algorithm
   return 0;
 }
 //

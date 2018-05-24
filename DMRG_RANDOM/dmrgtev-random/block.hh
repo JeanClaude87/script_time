@@ -60,7 +60,6 @@ public:
   //
   Block (const Block &, const Block &);				 // [block.cc]
   //
-  inline Barray &		parent		() const;	 // [block.hh]
   inline size_t			sites  		() const;	 // [block.hh]
   inline size_t			siteslft       	() const;        // [block.hh]
   inline size_t			sitesrgt       	() const;        // [block.hh]
@@ -117,8 +116,7 @@ public:
   Action & symmetry (size_t, Action &);				 // [block.cc]
   //
   void actionclear   (size_t, size_t);				 // [block.cc]
-  void add_states    (const Qnumber &, size_t, long,
-		      bool = true);	    	 		 // [block.cc]
+  void add_states    (const Qnumber &, size_t, long);	    	 // [block.cc]
   //
   void reflect       ();	       				 // [block.cc]
   void reflectlft    ();	       				 // [block.cc]
@@ -126,10 +124,9 @@ public:
   void reflectrgt    ();       					 // [block.cc]
   void release       ();                                         // [block.cc]
   //
-  void select_states (const Action &, size_t, size_t, double);	 // [block.cc]
+  void select_states (const Action &, size_t, size_t, double);		 // [block.cc]
   void show          (const string & = "");			 // [block.cc]
   void tensor	     (Action &, const Action &, const Action &); // [block.cc]
-  void tensorold     (Action &, const Action &, const Action &); // [block.cc]
   //
   //	Make a partial product of two actions contracting left
   //	b_tensor components and returns an Aarray indexed by 
@@ -212,15 +209,6 @@ inline const Qnumber & Block::number (size_t sub) const
   //	Quantum number of sub subspace
   //
   return b_quantum .number (sub);
-}
-//
-//____________________________________________________________________________
-inline Barray & Block::parent () const
-{
-  //
-  //	Quantum space
-  //
-  return b_parent;
 }
 //
 //____________________________________________________________________________

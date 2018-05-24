@@ -42,11 +42,11 @@ void householder (double * a, double * d, double * e, size_t n, size_t na)
   for (i = n - 1; i > 0; i--) {
     size_t i_1 = i - 1;
     double h   = 0.0;
-    for (j = 0; j < i; j++) h += square (a [i + j * na]);
+    for (j = 0; j < i; ++j) h += square (a [i + j * na]);
     if (h < eps) {
       d [i]   = a [i + i * na];
       e [i_1] = 0.0;
-      for (j = 0; j < i; j++) a [i + j * na] = a [j + i * na] = 0.0;
+      for (j = 0; j < i; ++j) a [i + j * na] = a [j + i * na] = 0.0;
     }
     else {
       double sigma = sqrt (h);
@@ -56,31 +56,31 @@ void householder (double * a, double * d, double * e, size_t n, size_t na)
       h = h + sigma * a [i + i_1 * na];
       a [i + i_1 * na] += sigma;
       double uau = 0.0;
-      for (j = 0; j < i; j++) {
+      for (j = 0; j < i; ++j) {
 	double au = 0.0;
-	for (k = 0; k < i; k++) au += a [j + k * na] * a [i + k * na];
+	for (k = 0; k < i; ++k) au += a [j + k * na] * a [i + k * na];
 	uau += au * a [i + j * na];
 	d [j] = au;
       }
-      for (j = 0; j < i; j++) {
+      for (j = 0; j < i; ++j) {
 	d [j] = d [j] / h - 0.5 * uau * a [i + j * na] / square (h);
 	a [j + i * na] = a [i + j * na] / h;
       }
-      for (j = 0; j < i; j++)
-	for (k = 0; k < i; k++) 
+      for (j = 0; j < i; ++j)
+	for (k = 0; k < i; ++k) 
 	  a [j + k * na] -= (a [i + j * na] * d [k] + d [j] * a [i + k * na]);
     }
   }
   d [0] = a [0];
   a [0] = 1.0;
-  for (i = 1; i < n; i++) {
-    for (k = 0; k < i; k++) {
+  for (i = 1; i < n; ++i) {
+    for (k = 0; k < i; ++k) {
       double uq = 0.0;
-      for (j = 0; j < i; j++) uq += a [i + j * na] * a [j + k * na];
-      for (j = 0; j < i; j++) a [j + k * na] -= uq * a [j + i * na];
+      for (j = 0; j < i; ++j) uq += a [i + j * na] * a [j + k * na];
+      for (j = 0; j < i; ++j) a [j + k * na] -= uq * a [j + i * na];
     }
     a [i + i * na] = 1.0;
-    for (j = 0; j < i; j++) a [i + j * na] = a [j + i * na] = 0.0;
+    for (j = 0; j < i; ++j) a [i + j * na] = a [j + i * na] = 0.0;
   }
 } 
 //
@@ -149,7 +149,7 @@ void householder (double * ar, double * ai, double * d, double * e,
     //	sigma^2 = sum{i<k} |a[k-1,k]|^2
     //	
     double alpha = 0.0;
-    for (i = 0; i < k; i++) 
+    for (i = 0; i < k; ++i) 
       alpha += (ar [i + k *na] * ar [i + k *na] + 
 		ai [i + k *na] * ai [i + k *na]);
     sigma = sqrt (alpha);
@@ -157,7 +157,7 @@ void householder (double * ar, double * ai, double * d, double * e,
       //
       //  column k is diagonal, no need to change basis
       //
-      for (i = 0; i < km1; i++) 
+      for (i = 0; i < km1; ++i) 
 	ar [i + k *na] = ar [k + i *na] = 
 	  ai [i + k *na] = ai [k + i *na] = 0.0;
       ar [k + k *na] = 1.0;
@@ -211,10 +211,10 @@ void householder (double * ar, double * ai, double * d, double * e,
     //		<u, A u>   = sum{i<k} <u,e_i> <e_i, A u>
     //
     double uau = 0.0;
-    for (i = 0; i < k; i++) {
+    for (i = 0; i < k; ++i) {
       double aur = 0.0;
       double aui = 0.0;
-      for (j = 0; j < k; j++) {
+      for (j = 0; j < k; ++j) {
 	aur += (ar [i + j *na] * ar [j + k *na] - 
 		ai [i + j *na] * ai [j + k *na]);
 	aui += (ar [i + j *na] * ai [j + k *na] + 
@@ -229,7 +229,7 @@ void householder (double * ar, double * ai, double * d, double * e,
     //
     //	Remember |u> / alpha in row k for transformation
     //
-    for (i = 0; i < k; i++) {
+    for (i = 0; i < k; ++i) {
       vr [i] = vr [i] / alpha - 0.5 * uau * ar [i + k *na] / (alpha * alpha);
       vi [i] = vi [i] / alpha - 0.5 * uau * ai [i + k *na] / (alpha * alpha);
       ar [k + i *na] = ar [i + k *na] / alpha;
@@ -240,8 +240,8 @@ void householder (double * ar, double * ai, double * d, double * e,
     //
     //		<q_i, A q_j> = <e_i, {A - |u> <v| - |v> <u|} e_j>
     //
-    for (i = 0; i < k; i++)
-      for (j = 0; j < k; j++) {
+    for (i = 0; i < k; ++i)
+      for (j = 0; j < k; ++j) {
 	ar [i + j *na] -= (ar [i + k *na] * vr [j] + ai [i + k *na] * vi [j] +
 			   vr [i] * ar [j + k *na] + vi [i] * ai [j + k *na]);
 	ai [i + j *na] -= (ai [i + k *na] * vr [j] - ar [i + k *na] * vi [j] +
@@ -250,7 +250,7 @@ void householder (double * ar, double * ai, double * d, double * e,
     //
     //	Apply phase factor
     //
-    for (i = 0; i < k; i++) {
+    for (i = 0; i < k; ++i) {
       double oldr = ar [i + km1 *na];
       double oldi = ai [i + km1 *na];
       ar [i + km1 *na] = (oldr * etar - oldi * etai);
@@ -280,7 +280,7 @@ void householder (double * ar, double * ai, double * d, double * e,
   //
   ar [0] = 1.0;	       
   ai [0] = 0.0;		
-  for (k = 1; k < n; k++) {
+  for (k = 1; k < n; ++k) {
     km1 = k - 1;
     //
     //	Apply phase factor to row k-1 
@@ -291,19 +291,19 @@ void householder (double * ar, double * ai, double * d, double * e,
     //
     //	Accumulate Q_k * Q = Q - |u> <u| Q /alpha 
     //
-    for (j = 0; j < k; j++) {
+    for (j = 0; j < k; ++j) {
       //
       //     uq = <u, Q e_j> / alpha
       //
       double uqr = 0.0;
       double uqi = 0.0;
-      for (i = 0; i < k; i++) {
+      for (i = 0; i < k; ++i) {
 	uqr +=  (ar [k + i *na] * ar [i + j *na] +
 		 ai [k + i *na] * ai [i + j *na]);  
 	uqi +=  (ar [k + i *na] * ai [i + j *na] -
 		 ai [k + i *na] * ar [i + j *na]);
       }
-      for (i = 0; i < k; i++) {
+      for (i = 0; i < k; ++i) {
 	ar [i + j *na] -= (ar [i + k *na] * uqr - ai [i + k *na] * uqi);
 	ai [i + j *na] -= (ai [i + k *na] * uqr + ar [i + k *na] * uqi);
       }
@@ -311,7 +311,7 @@ void householder (double * ar, double * ai, double * d, double * e,
     //	
     //	Next elements are initialized as identity elements
     //
-    for (i = 0; i < k; i++) 
+    for (i = 0; i < k; ++i) 
       ar [i + k *na] = ai [i + k *na] = ar [k + i *na] = ai [k + i *na] = 0.0;
     ar [k + k *na] = 1.0;
     ai [k + k *na] = 0.0;
@@ -371,13 +371,13 @@ void random_vector (double * v, size_t dimension)
   }
   double meanvalue = drand48 () - 0.5;
   double norm      = 0.0;
-  for (i = 0; i < dimension; i++) {
+  for (i = 0; i < dimension; ++i) {
     v [i] = drand48 () + meanvalue;
     norm += v [i] * v [i];
   }
   //
   norm = 1.0 / sqrt (norm);
-  for (i = 0; i < dimension; i++) v [i] *= norm;
+  for (i = 0; i < dimension; ++i) v [i] *= norm;
 }
 //
 //____________________________________________________________________________
@@ -387,10 +387,10 @@ void reorder_high_low (double * a, double * b, double * yr, double * yi,
   //
   //	Reorders arrays a, b and columns of matrix y in descending order of a
   //
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; ++i) {
     double pivot = a [i];
     size_t k = i;
-    for (size_t j = i+1; j < n; j++) 
+    for (size_t j = i+1; j < n; ++j) 
       if (a [j] > pivot) {
 	k = j;
 	pivot = a [j];
@@ -402,14 +402,14 @@ void reorder_high_low (double * a, double * b, double * yr, double * yi,
       b [k] = b [i];
       b [i] = pivot;
       if (yr) {
-	for (size_t j = 0; j < ny; j++) {
+	for (size_t j = 0; j < ny; ++j) {
 	  pivot = yr [j + k * ny];
 	  yr [j + k * ny] = yr [j + i * ny];
 	  yr [j + i * ny] = pivot;
 	}
       }
       if (yi) {
-	for (size_t j = 0; j < ny; j++) {
+	for (size_t j = 0; j < ny; ++j) {
 	  pivot = yi [j + k * ny];
 	  yi [j + k * ny] = yi [j + i * ny];
 	  yi [j + i * ny] = pivot;
@@ -426,10 +426,10 @@ void reorder_low_high (double * a, double * b, double * yr, double * yi,
   //
   //	Reorders arrays a, b and columns of matrix y in ascending order of a
   //
-  for (size_t i = 0; i < n; i++) {
+  for (size_t i = 0; i < n; ++i) {
     double pivot = a [i];
     size_t k     = i;
-    for (size_t j = i+1; j < n; j++) 
+    for (size_t j = i+1; j < n; ++j) 
       if (a [j] < pivot) {
 	k = j;
 	pivot = a [j];
@@ -441,14 +441,14 @@ void reorder_low_high (double * a, double * b, double * yr, double * yi,
       b [k] = b [i];
       b [i] = pivot;
       if (yr) {
-	for (size_t j = 0; j < ny; j++) {
+	for (size_t j = 0; j < ny; ++j) {
 	  pivot = yr [j + k * ny];
 	  yr [j + k * ny] = yr [j + i * ny];
 	  yr [j + i * ny] = pivot;
 	}
       }
       if (yi) {
-	for (size_t j = 0; j < ny; j++) {
+	for (size_t j = 0; j < ny; ++j) {
 	  pivot = yi [j + k * ny];
 	  yi [j + k * ny] = yi [j + i * ny];
 	  yi [j + i * ny] = pivot;
@@ -495,13 +495,13 @@ size_t tqli (double * d, double * e, double * yr, double *yi, long n, long ny)
   //
   if (n < 2)	return 0;
   e [n-1] = 0.0;
-  for (l = 0; l < n; l++) {
+  for (l = 0; l < n; ++l) {
     iter = 0;
     do {
       //	
       //	find first null off-diagonal with respect to nearest diagonal
       //
-      for (m = l; m < n-1; m++) {
+      for (m = l; m < n-1; ++m) {
         dd = fabs (d [m]) + fabs (d [m+1]);
 	if ((fabs (e [m]) + dd) == dd) break;
       }
@@ -529,13 +529,13 @@ size_t tqli (double * d, double * e, double * yr, double *yi, long n, long ny)
 	  p = s * r;
 	  d [i + 1] = g + p;
 	  g = c * r - b;
-	  for (k = 0; k < ny; k++) {
+	  for (k = 0; k < ny; ++k) {
 	    f = yr [k + (i+1) * ny];
 	    yr [k + (i+1) * ny] =  c * f + s * yr [k + i * ny];
 	    yr [k +     i * ny] = -s * f + c * yr [k + i * ny];
 	  }
 	  if (yi) {
-	    for (k = 0; k < ny; k++) {
+	    for (k = 0; k < ny; ++k) {
 	      f = yi [k + (i+1) * ny];
 	      yi [k + (i+1) * ny] =  c * f + s * yi [k + i * ny];
 	      yi [k +     i * ny] = -s * f + c * yi [k + i * ny];

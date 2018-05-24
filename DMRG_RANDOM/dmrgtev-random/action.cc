@@ -23,14 +23,9 @@ static const size_t csize =
 //
 static const size_t sparse_num = 5;
 static const size_t sparse_den = 8;
-extern vector<double>  renyientropy;		   	   	// [superaction.cc]
-extern vector<double>  renyiarg;		   	   		// [superaction.cc]
-double * autovalori		= 0;
-extern long	       	purelft;	    		    	// [superblock.cc]
-extern Action 	       	hlft;
-extern double *		energylft;
-extern size_t	       	edimlft;
-extern double 		frustlft;
+extern vector<double>  renyientropy;		   	   // [superaction.cc]
+extern vector<double>  renyiarg;		   	   // [superaction.cc]
+double * autovalori;
 //
 void fbmm (const long, const long, const long, const long, const long, double,
 	   const double *, const long, const double *, const long,
@@ -277,8 +272,7 @@ Action::Action (const Action & a, const Action & b)
     exit (0);
   }
   if (! (a .isnormal () && b .isnormal ())) {
-    cout << "Product of non normal Action's! " << a .scalar () << " "
-	 << b .scalar () << endl;
+    cout << "Product of non normal Action's!" << endl;
     exit (0);
   }
   scalar (0.0);
@@ -543,7 +537,7 @@ void Action::add (complex<double> c, const Action & other)
   *this += adding;
 }
 //____________________________________________________________________________
-void Action::clean    (double eps)
+void Action::clean    ()
 {
   //
   //  Check for effective null blocks putting corresponding 
@@ -555,7 +549,7 @@ void Action::clean    (double eps)
   //
   //	Counting not null elements for sparsing allocation
   //
-  if (eps <= 0.0)  eps = machine_precision ();
+  double eps = machine_precision ();
   size_t update = 0;
   size_t n;
   for (n = 0; n < blocks (); n++) {
@@ -684,37 +678,6 @@ void Action::compress (complex<double> * full)
 }
 //
 //____________________________________________________________________________
-void Action::conjugate ()
-{
-  //
-  //	Hermitian conjugate transformation
-  //
-  double * m = storage ();
-  if (m == 0) {
-    cout << "Conjugate of undefined Action!" << endl;
-    exit (0);
-  }
-  ((complex<double> *) m) [0] = conj (((complex<double> *) m) [0]);
-  //
-  //	All done for a scalar
-  //
-  if (a_size == csize) return;
-  //
-  //	define new blocks
-  //
-  Ablock * b = block ();
-  for (size_t nb = 0; nb < blocks (); nb++) {
-    size_t ioff = b [nb] .ab_ioffset;
-    if (ioff == 0.0) continue;
-    size_t is   = b [nb] .ab_range;
-    size_t js   = b [nb] .ab_domain;
-    size_t n   = width  (js) * height (is);
-    for (size_t j = 0; j < n; j++) m [ioff + j] = -m [ioff + j];
-  }
-  sparsed (0);
-}
-//
-//____________________________________________________________________________
 void Action::dagger ()
 {
   //
@@ -791,46 +754,6 @@ size_t Action::dimension () const
 }
 //
 //____________________________________________________________________________
-long Action::eigen (Action & v, double * e)
-{
-  //
-  //	Assuming *this hermitian computes eigenvalues and eigenvectors.
-  //
-  size_t i, nb, sub, offset, dimension;
-  v = *this;
-  Ablock * b = v .block ();
-  double * m = v .storage ();
-  size_t states = height ();
-  size_t ss	= 2 * states * sizeof(double);
-  Storage mem (ss);
-  double * diag = (double *) mem .storage ();
-  double * offd = diag + states;
-  for (i = 0; i < states; i++) diag [i] = 0.0;
-  for (nb = 0; nb < v .blocks (); nb++) {
-    if (b [nb] .ab_domain != b [nb] .ab_range) {
-      cout << "Action::eigen (): not block diagonal matrix!" << endl;
-      exit (0);
-    }
-    sub = b [nb] .ab_domain;
-    double * mr = 0;
-    double * mi = 0;
-    if (b [nb] .ab_roffset)	mr = m + b [nb] .ab_roffset;
-    if (b [nb] .ab_ioffset)	mi = m + b [nb] .ab_ioffset;
-    dimension = v .width (sub);
-    offset    = v .domain () .offset (sub);
-    householder (mr, mi, diag + offset, offd + offset, dimension, dimension);
-    if (tqli (diag + offset, offd + offset, mr, mi, dimension, dimension)) {
-      cout << "Action::eigen (): tqli error!" << endl;
-      exit (0);
-    }
-    reorder_low_high (diag + offset, offd + offset, mr, mi,
-		      dimension, dimension);
-  }
-  for (i = 0; i < states; i++) e [i] = diag [i];
-  return 0;
-}
-//
-//____________________________________________________________________________
 double Action::entropy () const
 {
   //
@@ -845,59 +768,9 @@ double Action::entropy () const
   s .dagger ();
   density *= s;
   density .clean ();
+  //
   Ablock * b  = density .block   ();
   double * m  = density .storage ();
-  //density .show ("rho");
-  //
-  // compute frustration
-  //
-  frustlft = 0.0;
-  if (purelft >= 0) {
-    double eground = energylft [0] + 1.0;
-    for (i = 0; i < edimlft; i++)
-      if (energylft [i] < eground) eground = energylft [i];
-    frustlft = 0.0;
-    Ablock * ub = hlft .block ();
-    double * um = hlft .storage ();
-    for (nb = 0; nb < density .blocks (); nb++) {
-      //	
-      //	A simple check if density is block diagonal
-      //
-      if (b [nb] .ab_domain != b [nb] .ab_range) {
-	cout << "Action::entropy (): not block diagonal density!" << endl;
-	exit (0);
-      }
-      size_t nu;
-      sub = b [nb] .ab_domain;
-      for (nu = 0; nu < hlft .blocks (); nu++)
-	if (ub [nu] .ab_domain == sub) break;
-      if (nu >= hlft .blocks ()) continue;
-      offset 	= density .domain () .offset (sub);
-      dimension = density .width (sub);
-      for (i = 0; i < dimension; i++) {
-	if (fabs (energylft [i+offset] - eground) < 1.e-12)  {
-	double * mr = 0;
-	double * mi = 0;
-	if (b [nb] .ab_roffset) mr = m + b [nb] .ab_roffset;
-	if (b [nb] .ab_ioffset) mi = m + b [nb] .ab_ioffset;
-	double * ur = 0;
-	double * ui = 0;
-	if (ub [nu] .ab_roffset) ur = um + ub [nu] .ab_roffset;
-	if (ub [nu] .ab_ioffset) ui = um + ub [nu] .ab_ioffset;
-	if (ur) ur += i * dimension;
-	if (ui) ui += i * dimension;
-	size_t j, k, jk;
-	for (k = 0, jk = 0; k < dimension; k++) 
-	  for (j = 0; j < dimension; j++, jk++) {
-	    if (mr && ur)  frustlft += ur [j] * mr [jk] * ur [k];
-	    if (mr && ui)  frustlft += ui [j] * mr [jk] * ui [k];
-	    if (mi && ur && ui)  frustlft += 2.0 * ui [j] * mi [jk] * ur [k];
-	  }
-	}
-      }
-    }
-  }
-  frustlft = 1.0 - frustlft;
   //
   size_t states = height ();
   size_t ss = (2 * states * sizeof (double));
@@ -912,7 +785,7 @@ double Action::entropy () const
     //	A simple check if density is block diagonal
     //
     if (b [nb] .ab_domain != b [nb] .ab_range) {
-      cout << "Action::entropy (): not block diagonal density!" << endl;
+      cout << "Not block diagonal density matrix!" << endl;
       exit (0);
     }
     sub = b [nb] .ab_domain;
@@ -920,14 +793,14 @@ double Action::entropy () const
     double * mi = 0;
     if (b [nb] .ab_roffset) mr = m + b [nb] .ab_roffset;
     if (b [nb] .ab_ioffset) mi = m + b [nb] .ab_ioffset;
-    dimension = density .width  (sub);
+    dimension = density .width  (b [nb] .ab_domain);
     offset    = density .domain () .offset (sub);
     //
     //	Diagonalize diagonal block
     //
     householder (mr, mi, eigen + offset, offd + offset, dimension, dimension);
     if (tqli (eigen + offset, offd + offset, mr, mi, dimension, dimension)) {
-      cout << "Action::entropy (): tqli error!" << endl;
+      cout << "Block::select_states (): tqli error!" << endl;
       exit (0);
     }
   }

@@ -775,9 +775,7 @@ size_t Lanczos::thick (Superaction & superaction, Action & guess)
 Superaction::Superaction ()
   : sa_bipoli	(),
     sa_biaction	(),
-    sa_inner	(),
-    sa_purelft	(-1),
-    sa_purergt	(-1)
+    sa_inner	()
 { 
   //
   //	Default ctor.
@@ -788,9 +786,7 @@ Superaction::Superaction ()
 Superaction::Superaction (const Superaction & other)
   : sa_bipoli	(other .sa_bipoli),
     sa_biaction	(other .sa_biaction),
-    sa_inner	(other .sa_inner),
-    sa_purelft	(other .sa_purelft),
-    sa_purergt	(other .sa_purergt)
+    sa_inner	(other .sa_inner)
 { 
   //
   //	Copy ctor.
@@ -798,105 +794,11 @@ Superaction::Superaction (const Superaction & other)
 }
 //
 //____________________________________________________________________________
-Action evolve (const Apoli & hlattice, long splitlft, long splitrgt,
-	       Block & system, Block & universe, double delta)
-{
-  size_t m, n, sub, offset, dimension, sites;
-  // long splitlft = system .sites () - 1;
-  // long splitrgt = splitlft+1;
-  sites = system .sites () + universe .sites ();
-  Apoli hsub;
-  //hlattice .show ("hlattice");
-  for (m = 0; m < hlattice .size (); m++) {
-    Amono mono = hlattice [m];
-    long inner = 0;
-    if (mono .order () == 1) {
-      long index = mono [n] .af_st;
-      if ((index > 0) || (index < sites - 1)) mono *= 0.5;
-    }
-    for (n = 0; n < mono .order (); n++) {
-      Afactor af (mono [n]);
-      if (af .af_st < splitlft) continue;
-      if (af .af_st > splitrgt) continue;
-      inner++;
-      mono [n] .af_st -= splitlft;
-    }
-    if (inner && (inner == mono.order ())) {
-      //cout << "mono " << mono .am_coeff << " " << mono .str () << endl;
-      hsub += mono;
-    }
-  }
-  //hsub .show ("hsub");
-  Block pp (system .parent () [1], universe .parent () [1]);
-  Action hh, uu, bb;
-  bb = pp .base ();
-  hh = pp .action (hsub, hh);
-  //hh .show ("h2");
-  uu = Action (hh .range (), hh .domain ());
-  uu .scalaridentity (1.0);
-  size_t states = pp .states ();
-  double * eigen = new double [2 *states];
-  for (m = 0; m < 2 * states; m++) eigen [m] = 0.0;
-  double * offd = eigen + states;
-  Ablock * b = hh .block ();
-  Ablock * ub = uu .block ();
-  double * mm = hh .storage ();
-  for (size_t nb = 0; nb < hh .blocks (); nb++) {
-    if (b [nb] .ab_domain != b [nb] .ab_range) {
-      cout << "errrrrrrore" << endl;
-      exit (0);
-    }
-    sub = b [nb] .ab_domain;
-    ub [sub - 1] .ab_roffset = 0;
-    double * mr = 0;
-    double * mi = 0;
-    if (b [nb] .ab_roffset) mr = mm + b [nb] .ab_roffset;
-    if (b [nb] .ab_ioffset) mi = mm + b [nb] .ab_ioffset;
-    dimension = hh .width (sub);
-    offset    = hh .domain () .offset (sub);
-    householder (mr, mi, eigen + offset, offd + offset, dimension, dimension);
-    if (tqli (eigen + offset, offd + offset, mr, mi,dimension, dimension)) {
-      cout << "tqli errrrrror" << endl;
-      exit (0);
-    }
-  }
-  hh += uu;
-  //cout << "eigen" << endl;
-  //for (m = 0; m < states; m++) cout << eigen [m] << " ";
-  //cout << endl;
-  //hh .show ("vectors");
-  uu = hh;
-  uu .dagger ();
-  complex<double> * mri = new complex<double> [states * states];
-  hh .expand (mri);
-  complex<double> zi (0.0, -delta);
-  for (n = 0; n < states; n++) {
-    for (m = 0; m < states; m++) {
-      mri [m + n*states] *= exp( zi * eigen [m]);
-    }
-  }
-  hh .compress (mri);
-  delete [] mri;
-  delete [] eigen;
-  uu *= hh;
-  //uu .show ("uu");
-  hh = bb;
-  bb .dagger ();
-  uu *= bb;
-  hh *= uu;
-  //cout << "split left " << splitlft << " ";
-  //hh .show ("gug");
-  return hh;
-}
-//
-//____________________________________________________________________________
 Superaction::Superaction (const Apoli & poli, 
 			  Block & system, Block & universe, bool releasing)  
   : sa_bipoli	(),
     sa_biaction	(),
-    sa_inner	(),
-    sa_purelft	(-1),
-    sa_purergt	(-1)
+    sa_inner	()
 { 
   //
   //	Transform the formal polinomial poli into a sum of tensor 
@@ -911,7 +813,6 @@ Superaction::Superaction (const Apoli & poli,
   //	Load sa_bipoli with splitted polinomial
   //
   long split = system .sites ();
-  long unisites = universe .sites ();
   for (m = 0; m < poli .size (); m++) {
     Bipoli factor;
     const Amono & mono     = poli [m];
@@ -926,7 +827,7 @@ Superaction::Superaction (const Apoli & poli,
       }
     }
     sa_bipoli .push_back (factor);
-  }
+  } 
   //
   while (true) {
     ml = mr = nl = nr = 0;
@@ -1049,37 +950,24 @@ Superaction::Superaction (const Apoli & poli,
     if ((sa_bipoli [m] .bi_lft .order () == 0) &&
 	(sa_bipoli [m] .bi_rgt .order () >  0)) nl = m; 
   }
-  if (nr < sa_bipoli .size ()) sa_purelft = nr;
-  if (nl < sa_bipoli .size ()) sa_purergt = nl;
   //
   if ((n < sa_bipoli .size ()) && 
       (! ((nl == sa_bipoli .size ()) && (nr == sa_bipoli .size ()))) ) {
     //
     //	Distribute pure scalar between left and right scalar term  
     //
-    complex<double> coeff = sa_bipoli [n] .bi_coeff *
+     complex<double> coeff = sa_bipoli [n] .bi_coeff *
       sa_bipoli [n] .bi_lft [0] .am_coeff * 
       sa_bipoli [n] .bi_rgt [0] .am_coeff;
-    complex<double> clft, crgt;
-    if (nl < sa_bipoli .size ()) {
-      clft = 0.0;
-      crgt = coeff;
-    }
-    if (nr < sa_bipoli .size ()) {
-      clft = coeff;
-      crgt = 0.0;
-    }
-    if ((nl < sa_bipoli .size ()) && (nr < sa_bipoli .size ())) {
-      clft = coeff * ((double) split) / ((double) (split + unisites));
-      crgt = coeff * ((double) unisites) / ((double) (split + unisites));
-    }
+    if ((nl < sa_bipoli .size ()) && (nr < sa_bipoli .size ())) 
+      coeff *= 0.5;
     if (nl < sa_bipoli .size ()) {
       //
       //	Add scalar to right true polinomial
       //
       sa_bipoli [nl] .bi_rgt *= sa_bipoli [nl] .bi_coeff;
       sa_bipoli [nl] .bi_coeff = 1.0;
-      sa_bipoli [nl] .bi_rgt += crgt;
+      sa_bipoli [nl] .bi_rgt += coeff;
     }
     if (nr < sa_bipoli .size ()) {
       //
@@ -1087,11 +975,9 @@ Superaction::Superaction (const Apoli & poli,
       //
       sa_bipoli [nr] .bi_lft *= sa_bipoli [nr] .bi_coeff;
       sa_bipoli [nr] .bi_coeff = 1.0;
-      sa_bipoli [nr] .bi_lft += clft;
+      sa_bipoli [nr] .bi_lft += coeff;
     }
     sa_bipoli .erase (sa_bipoli .begin () + n);
-    if (sa_purelft > n) sa_purelft--;
-    if (sa_purergt > n) sa_purergt--;
   }
   /*
   //
@@ -1172,8 +1058,6 @@ Superaction & Superaction::operator = (const Superaction & other)
     sa_bipoli    = other .sa_bipoli;
     sa_biaction  = other .sa_biaction;
     sa_inner    << other .sa_inner;	// grab inner storage area
-    sa_purelft   = other .sa_purelft;
-    sa_purergt   = other .sa_purergt;
   }
   return *this;
 }
@@ -1313,7 +1197,7 @@ void biapply (double * mr, Superaction & superaction, double * ms,
 }
 //
 //____________________________________________________________________________
- void biapply (Action & result, 
+void biapply (Action & result, 
 	      Superaction & superaction, const Action & state, bool releasing)
 {
   //

@@ -56,8 +56,6 @@ private:
   vector<Bipoli>	sa_bipoli;	
   vector<Biaction>	sa_biaction;
   Storage		sa_inner;
-  long			sa_purelft;
-  long			sa_purergt;
   //
 public:
   Superaction  ();					   // [superaction.cc]
@@ -79,8 +77,6 @@ public:
   inline const Apoli &   rightpolinomial (size_t) const;   // [superaction.hh]
   inline size_t	    	 size            ()       const;   // [superaction.hh]
   inline double *	 storage	 ()	  const;   // [superaction.hh]
-  inline long		 onlylft	 ()	  const;   // [superaction.hh]
-  inline long		 onlyrgt	 ()	  const;   // [superaction.hh]
   //
   void storage   (size_t);			       	   // [superaction.cc]
   bool iscomplex () const;				   // [superaction.cc]
@@ -164,8 +160,7 @@ void   biapply  (double *, Superaction &, double *,
 		 bool = false);			           // [superaction.cc]
 void   biapply  (Action &, Superaction &, const Action &,
 		 bool = false); 			   // [superaction.cc]
-Action evolve (const Apoli &, long, long,
-	       Block &, Block &, double);       	//
+//
 //============================================================================
 inline double Lanczos::error (size_t index) const
 {
@@ -254,18 +249,6 @@ inline const Apoli & Superaction::leftpolinomial (size_t index) const
   //	left polinomial of index-th tensor product
   //
   return sa_bipoli [index] .bi_lft;
-}
-//
-//____________________________________________________________________________
-inline long Superaction::onlylft () const
-{
-  return sa_purelft;
-}
-//
-//____________________________________________________________________________
-inline long Superaction::onlyrgt () const
-{
-  return sa_purergt;
 }
 //
 //____________________________________________________________________________

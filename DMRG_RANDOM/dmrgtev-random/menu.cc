@@ -104,7 +104,6 @@ extern bool		reflect_universe;      			 // [dmrg.cc]
 extern size_t		zips;					 // [dmrg.cc]
 extern size_t		zipinner;      				 // [dmrg.cc]
 extern bool		halfsweep;				 // [dmrg.cc]
-extern bool		forcezip;				 // [dmrg.cc]
 extern size_t  	       	show_blocks;				 // [dmrg.cc]
 extern size_t		show_density;				 // [dmrg.cc]
 extern size_t 		show_hamiltonian;			 // [dmrg.cc]
@@ -147,7 +146,6 @@ extern size_t		lanczos_repeats;       		  // [superaction.cc]
 extern size_t		lanczos_strategy;		  // [superaction.cc]
 //
 extern bool 		evolution_active;		         // [dmrg.cc]
-extern bool 		trotter_active;			         // [dmrg.cc]
 extern double		tensorweight;			   // [superblock.cc]
 //
 //===========================================================================
@@ -301,11 +299,6 @@ static Menu menu_subspace [] =
     //	Parity name and value
     //
     { "parity",			menu_space_p,	0			},
-    //
-    //	Left and right link values (default 0)
-    //
-    { "lftlnk",			menu_real,	& qlftlnk		},
-    { "rgtlnk",			menu_real,	& qrgtlnk		},
     { "", 0, 0 }
   };    
 //
@@ -319,7 +312,7 @@ static Menu menu_time [] =
     { "steps_number",           menu_size,  	 & steps_number          },
     { "step_divisions",         menu_size,  	 & step_divisions        },
     { "time_zips",              menu_size,  	 & time_zips             },
-    { "dmrg_timestates",	menu_dmrgstime,	 0		       	 },
+    { "dmrg_timestates",	menu_dmrgstime,	 0			},
     { "timeham_begin",          menu_hamtb, 	 0                       },
     { "timeham_end",            menu_hamte, 	 0                       },
     { "target",                 menu_ttarget, 	 0                       },
@@ -358,7 +351,6 @@ static Menu menu_main [] =
     { "halfsweep",		menu_boolean,	& halfsweep		},
     { "half_zip",		menu_boolean,	& halfsweep		},
     { "halfzip",		menu_boolean,	& halfsweep		},
-    { "forcesweep",		menu_boolean,	& forcezip		},
     { "block_states",		menu_dmrgs,	0			},
     { "dmrg_states",		menu_dmrgs,	0			},
     { "density_action",		menu_density,	0			},
@@ -393,8 +385,7 @@ static Menu menu_main [] =
     //
     //  Evolution flag
     //
-    { "evolution",              menu_evolution, & evolution_active      },
-    { "trotter",		menu_evolution, & trotter_active        },
+    { "evolution",              menu_evolution, 0                       },
     { "timestep",               menu_real,      & timestep              },
     { "steps_number",           menu_size,      & steps_number          },
     { "step_divisions",         menu_size,  	& step_divisions        },
@@ -540,7 +531,7 @@ bool quantum_alternate (size_t index)
 //____________________________________________________________________________
 bool quantum_alternate ()
 {
-  for (size_t i = 0; i < qalternate .size (); i++)
+  for (size_t i = 0; i < qalternate .size (); ++i)
     if (qalternate [i]) return true;
   return false;
 }
@@ -565,8 +556,8 @@ static void menu_action (void *)
   //
   //	Get values and reorder them according to internal order
   //
-  for (size_t i = 0; i < states; i++) 
-    for (size_t j = 0; j < states; j++) 
+  for (size_t i = 0; i < states; ++i) 
+    for (size_t j = 0; j < states; ++j) 
       menu_complex (m + order[i] + order[j] * states);
   //
   //	Build the action
@@ -776,13 +767,12 @@ static void menu_endwhile (void *)
 }
 //
 //____________________________________________________________________________
-static void menu_evolution (void * data)
+static void menu_evolution (void *)
 {
   //
   //     Activate evolution and define evolution parameters
   //
-  bool & par = ((bool *) data) [0];
-  par = true;
+  evolution_active = true;
   timestring = input_next(true);
   menu_parse(menu_time);
 }
@@ -1315,8 +1305,7 @@ static void menu_target (void *)
   target_request [found] .add_states (Qnumber (qid, qvalue, qparity, 
 					       qlftlnk, qrgtlnk),
 				      qstates, qstatistic);
-}
-//
+}//
 //____________________________________________________________________________
 static void menu_true (void * data)
 {
@@ -1380,12 +1369,10 @@ void space_reset ()
   qstatistic = 0;
   qvalues = 0;
   qparities = 0;
-  qlftlnk = 0.0;
-  qrgtlnk = 0.0;
   qid = 0;
   qsites = 0;
-  for (size_t i = 0; i < qvalue  .size (); i++) qvalue  [i] = 0.0;
-  for (size_t i = 0; i < qparity .size (); i++) qparity [i] = 0.0;
+  for (size_t i = 0; i < qvalue  .size (); ++i) qvalue  [i] = 0.0;
+  for (size_t i = 0; i < qparity .size (); ++i) qparity [i] = 0.0;
 }
 //
 //============================================================================

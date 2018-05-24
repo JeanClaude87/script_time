@@ -271,7 +271,7 @@ static bool input_search (Slist & ilist,
   //
   Slist::iterator n;
   string to_find (name);
-  for (n = ilist .begin (); n != ilist .end (); n++) {
+  for (n = ilist .begin (); n != ilist .end (); ++n) {
     string::size_type p, e;
     string s = *n;
     if (s .find (to_find) == string::npos) continue;
@@ -352,7 +352,7 @@ static void input_split ()
   bool nostring = true;
   bool noop   	= true;
   long parlevel = 0;
-  for (Slist::iterator l = input_list .begin (); l != input_list .end (); l++)	 {
+  for (Slist::iterator l = input_list .begin (); l != input_list .end (); ++l)	 {
     string & line = *l;
     for (string::size_type p = 0; p < line .size (); p++) {
       if (nostring && (line [p] == '(')) parlevel++;

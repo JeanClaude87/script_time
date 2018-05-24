@@ -46,7 +46,6 @@ public:
   //
   Space ();							 // [space.cc]
   Space (const Space &);					 // [space.cc]
-  Space (const Space &, const Space &);        			 // [space.cc]
   ~Space ();							 // [space.cc]
   //
   inline const Subspace & operator [] (size_t) const;		 // [space.hh]
@@ -146,7 +145,6 @@ public:
   //
   //	Setup
   //
-  size_t add_space  (const Qnumber &, size_t, long = 0);       	 // [space.cc]
   size_t add_states (const Qnumber &, size_t, long = 0);       	 // [space.cc]
   void   reflect    ();						 // [space.cc]
   //

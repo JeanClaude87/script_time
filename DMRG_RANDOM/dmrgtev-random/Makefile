@@ -7,7 +7,7 @@
 #		actual directory.
 #
 NAME 		:= dmrgtev
-VERSION		:= 10.random
+VERSION		:= 10.1
 #
 ############################################################################
 #
@@ -54,7 +54,7 @@ CXXSOURCES	:= $(filter %.cc, $(SOURCES))
 #
 #	Compilation objects
 #
-COBJECTS	:= $(patsubst %.c,  %.o,	$(CSOURCES))		 
+COBJECTS	:= $(patsubst %.c,  %.o,   $(CSOURCES))       
 CXXOBJECTS 	:= $(patsubst %.cc, %.o, $(CXXSOURCES))
 OBJECTS 	:= $(sort $(COBJECTS) $(CXXOBJECTS))
 #
@@ -64,9 +64,9 @@ PATHSOURCES	:= $(patsubst %, $(shell basename `pwd`)/%, $(SOURCES))
 #
 #	Targets, not sources files and intermediate files
 #
-TARGETS		= $(wildcard $(EXECUTABLE) *.out)
-NOTSOURCES	= $(filter-out $(SOURCES), $(wildcard *))
-GARBAGE		= $(filter-out $(TARGETS) $(ARCHIVE), $(NOTSOURCES))
+TARGETS  	 = $(wildcard $(EXECUTABLE) *.out)
+NOTSOURCES	 = $(filter-out $(SOURCES), $(wildcard *))
+GARBAGE  	 = $(filter-out $(TARGETS) $(ARCHIVE), $(NOTSOURCES))
 #
 #	Actual date
 #
@@ -76,14 +76,14 @@ NOW		 = $(shell date '+%y%m%d')
 #
 #	Compilation control variables 
 #
-#
 CPP		:= gcc
 CC 		:= gcc
 LD 		:= gcc
 #
-#CPP		:= /usr/local/Cellar/gcc/8.1.0/bin/gcc-8
-#CC 		:= /usr/local/Cellar/gcc/8.1.0/bin/gcc-8
-#LD 		:= /usr/local/Cellar/gcc/8.1.0/bin/gcc-8
+#CPP		:= /Users/naldesi/Downloads/usr/local/bin/gcc
+#CC 		:= /Users/naldesi/Downloads/usr/local/bin/gcc
+#LD 		:= /Users/naldesi/Downloads/usr/local/bin/gcc
+#
 #	Options
 #
 DFLAGS		:= -E -MM
@@ -127,7 +127,7 @@ endif
 #	Compilation rules
 #
 %.o:	%.c
-	$(CC) -c $(CPPFLAGS) $(CFLAGS)	$< -o $@
+	$(CC) -c $(CPPFLAGS) $(CFLAGS)   $< -o $@
 %.o:  	%.cc
 	$(CC) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 #
@@ -152,7 +152,7 @@ endif
 	@tar -cvf - -C ../ $(PATHSOURCES) | gzip -9 > $@
 %.tbz:	$(SOURCES)
 	@echo "Creating archive $@ containing:"
-	@tar -cvf - -C ../ $(PATHSOURCES) | bzip2	> $@
+	@tar -cvf - -C ../ $(PATHSOURCES) | bzip2   > $@
 #
 ############################################################################
 #
@@ -212,16 +212,16 @@ $(EXECUTABLE):	$(OBJECTS)
 version.h:	Makefile
 	@printf "%-8s%-32s%-24s%-10s\n" 			\
 		"/*" "version.h" "$(COPYRIGHT)" "fbo $(NOW)"	>  $@
-	@printf "		  ============================="		>> $@
+	@printf "        ============================="		>> $@
 	@printf "=====================================  */\n"	>> $@
 	@echo "#ifndef VERSION_H"				>> $@
 	@echo "#define VERSION_H"				>> $@
 	@echo "/*  Automatic generated file. Don't edit!  */"	>> $@
-	@echo "#define NAME		\"$(NAME)\""			>> $@
-	@echo "#define VERSION	\"$(VERSION)\""		>> $@
+	@echo "#define NAME      \"$(NAME)\""			>> $@
+	@echo "#define VERSION   \"$(VERSION)\""		>> $@
 	@echo "#define COPYRIGHT \"$(COPYRIGHT) fbo $(NOW)\""	>> $@
 	@echo "#define HOSTTYPE  \"$(HOSTTYPE)\""		>> $@
-	@echo "#define OSTYPE	 \"$(OSTYPE)\""			>> $@
+	@echo "#define OSTYPE    \"$(OSTYPE)\""			>> $@
 	@echo "#define MACHTYPE  \"$(MACHTYPE)\""		>> $@
 	@echo "#endif /* VERSION_H */"				>> $@
 	@printf "/* ==================================="	>> $@
@@ -232,16 +232,16 @@ version.h:	Makefile
 version.hh:	Makefile
 	@printf "%-8s%-32s%-24s%-10s\n" 			\
 		"//" "version.hh" "$(COPYRIGHT)" "fbo $(NOW)"	>  $@
-	@printf "//		============================="		>> $@
+	@printf "//      ============================="		>> $@
 	@printf "=====================================\n"	>> $@
 	@echo "#ifndef VERSION_HH"				>> $@
 	@echo "#define VERSION_HH"				>> $@
-	@echo "//		Automatic generated file. Don't edit!"	>> $@
-	@echo "#define NAME		\"$(NAME)\""			>> $@
-	@echo "#define VERSION	\"$(VERSION)\""		>> $@
+	@echo "//      Automatic generated file. Don't edit!"	>> $@
+	@echo "#define NAME      \"$(NAME)\""			>> $@
+	@echo "#define VERSION   \"$(VERSION)\""		>> $@
 	@echo "#define COPYRIGHT \"$(COPYRIGHT) fbo $(NOW)\""	>> $@
 	@echo "#define HOSTTYPE  \"$(HOSTTYPE)\""		>> $@
-	@echo "#define OSTYPE	 \"$(OSTYPE)\""			>> $@
+	@echo "#define OSTYPE    \"$(OSTYPE)\""			>> $@
 	@echo "#define MACHTYPE  \"$(MACHTYPE)\""		>> $@
 	@echo "#endif // VERSION_HH"				>> $@
 	@printf "//==================================="		>> $@
@@ -252,7 +252,7 @@ version.hh:	Makefile
 #	Dependency list creation and inclusion
 #
 depend:	version.h version.hh $(CSOURCES) $(CXXSOURCES)	
-	@$(CPP) $(DFLAGS) $(CPPFLAGS) $(CSOURCES) $(CXXSOURCES) > $@ 
+	@$(CPP) $(DFLAGS) $(CPPFLAGS) $(CSOURCES) $(CXXSOURCES) > $@
 -include	depend
 #
 ############################################################################

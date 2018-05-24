@@ -1,16 +1,16 @@
-define                  L               20
+define                  L               14
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
 define                  V0              100.0
-define                  Delta   0.0
-define                  Delta0  0.0
+define                  Delta   6.0
+define                  Delta0  100.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
 dmrg_states                     0       0       50  50         0
-dmrg_timestates         0.0     0       0       10  100         0.0001
+dmrg_timestates         0.0     0       0       10  1000         0.000001
 
 memory                          80000
 show                                    memory
@@ -100,7 +100,7 @@ ham_end
                 done
 
 
-//..................................................................EVOLUZIONE  TEMPORALE_TROTTER
+//..................................................................TIME_EVO_TROTTER
 /*
 
 define  tstep                                           0.05
@@ -113,12 +113,12 @@ trotter         time
 */
 
 
-//..................................................................TIME_EVO
+//..................................................................TIME_EVO_R-KUTTA-4
 
 evolution               time
                                 time_zips                               1
-                                timestep                                0.05
-                                steps_number                            4
+                                timestep                                0.1
+                                steps_number                            10000
                                 target psi                              0
 
 //..................................................................HAMILTONIANA DINAMICA

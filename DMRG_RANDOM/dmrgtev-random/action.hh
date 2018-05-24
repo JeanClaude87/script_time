@@ -218,7 +218,6 @@ public:
   bool 			  isscalar  () const;	      		// [action.cc]
   double		  entropy   () const;		       	// [action.cc]
   size_t		  dimension () const;			// [action.cc]
-  long			  eigen	    (Action &, double *);	// [action.cc]
   //
   //	setting methods
   //
@@ -235,9 +234,8 @@ public:
   //	modify methods
   //
   void add	      (complex<double>, const Action &);       	// [action.cc]
-  void clean          (double=0.0);                             // [action.cc]
+  void clean          ();                                       // [action.cc]
   void compress       (complex<double> *);             		// [action.cc]
-  void conjugate      ();	       				// [action.cc]
   void dagger	      ();	       				// [action.cc]
   void expand	      (complex<double> *) const;       		// [action.cc]
   void merge	      (const Action &, size_t = 0);		// [action.cc]
