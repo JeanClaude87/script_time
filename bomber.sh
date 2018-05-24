@@ -5,7 +5,7 @@ CODIR=$(pwd)
 rm -f $CODIR/script_wait.sh
 printf "%s\n" "#!/bin/bash" >> $CODIR/script_wait.sh
 
-for gamma in $(seq -w 14 2 14)
+for gamma in $(seq -w 12 2 12)
    do
 
    for beta in $(seq -w 2.0 1.0 5.0)

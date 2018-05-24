@@ -2,15 +2,15 @@ define                  L               14
 define                  Np              0
 define                  t               -1.0
 define                  V               2.0
-define                  Delta   5.0
+define                  V0              100.0
+define                  Delta   6.0
 define                  Delta0  1000.0
 
 define                  iu              sqrt(-1.0)
 define                  pi              2.0*arg(iu)
 
-
-dmrg_states                     0       0       10  40          0.0000001
-dmrg_timestates         0.0     0       0       10  400        0.0000001
+dmrg_states                     0       0       50  50         0
+dmrg_timestates         0.0     0       0       10  1000         0.000001
 
 memory                          80000
 show                                    memory
@@ -69,13 +69,17 @@ ham_begin       Sites
 
                 do      i       0       Sites-1 1
                 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2 
                                 action  Sp      i
                                 action  Sm      i+1
 
-                        term    coeff           t/2*0.000001            
+                        term    coeff           t/2          
                                 action  Sm      i
                                 action  Sp      i+1             
+
+                        term    coeff           V0*t
+                                action  Sz      i
+                                action  Sz      i+1
 
                         term    coeff           Delta0*random1m1(i)     
                                 action  Sz      i
@@ -96,17 +100,26 @@ ham_end
                 done
 
 
-//..................................................................EVOLUZIONE  TEMPORALE
+//..................................................................TIME_EVO_TROTTER
+/*
 
-
-define  tstep                                           0.25
+define  tstep                                           0.05
 
 trotter         time
                                 time_zips                       10
                                 timestep                        tstep
-                                steps_number                    4001
+                                steps_number                    4
                                 target  psi                     0
+*/
 
+
+//..................................................................TIME_EVO_R-KUTTA-4
+
+evolution               time
+                                time_zips                               1
+                                timestep                                0.1
+                                steps_number                            5000
+                                target psi                              0
 
 //..................................................................HAMILTONIANA DINAMICA
 
@@ -166,4 +179,3 @@ trotter         time
 
                 end
 
-//ugauaguaguagaugauaguagauag
