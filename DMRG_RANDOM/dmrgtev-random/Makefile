@@ -76,13 +76,13 @@ NOW		 = $(shell date '+%y%m%d')
 #
 #	Compilation control variables 
 #
-CPP		:= gcc
-CC 		:= gcc
-LD 		:= gcc
+CPP		:= icc
+CC 		:= icc
+LD 		:= icc
 #
-#CPP		:= /Users/naldesi/Downloads/usr/local/bin/gcc
-#CC 		:= /Users/naldesi/Downloads/usr/local/bin/gcc
-#LD 		:= /Users/naldesi/Downloads/usr/local/bin/gcc
+#CPP		:= gcc
+#CC 		:= gcc
+#LD 		:= gcc 
 #
 #	Options
 #

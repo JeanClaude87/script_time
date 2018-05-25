@@ -452,7 +452,7 @@ void evolution (Block & system, Block & universe)
         //properties every 10 tstep
  
         double tprop;
-        tprop = fmod(t+tau/10,5);
+        tprop = fmod(t+tau/10,10);
         if ( fabs(tprop) <= tau/10) {
             properties (system, universe, phi [0], phi [0], norm2, t);
             }
