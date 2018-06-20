@@ -101,9 +101,14 @@ extern Storage		report;					  // [dmrg.cc]
 extern vector<double>	autovalori;
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
 //============================================================================
 void evolution (Block & system, Block & universe)
 {
+
+    int tprop;
+    tprop = 19;
+
     Aarray phi;
     Action phihalf;
     size_t ket,l;
@@ -451,13 +456,12 @@ void evolution (Block & system, Block & universe)
 
         //properties every 10 tstep
  
-        double tprop;
-        tprop = fmod(t+tau/10,10);
-        if ( fabs(tprop) <= tau/10) {
+        tprop++;
+        if ( tprop == 20) {
             properties (system, universe, phi [0], phi [0], norm2, t);
+            tprop = 0;
             }
-            
-            
+
             double norm0 = multiply (phi [6], phi [6]) .real ();
             double ent = phi [0] .entropy ();
             cout << "Entropy " << setw (14) << setprecision (10) << ent << endl;

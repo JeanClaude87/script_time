@@ -76,14 +76,14 @@ NOW		 = $(shell date '+%y%m%d')
 #
 #	Compilation control variables 
 #
-CPP		:= icc
-CC 		:= icc
-LD 		:= icc
+# CPP		:= icc
+#CC 		:= icc
+#LD 		:= icc
 #
-#CPP		:= gcc
-#CC 		:= gcc
-#LD 		:= gcc 
-#
+CPP		:= gcc
+CC 		:= gcc
+LD 		:= gcc 
+
 #	Options
 #
 DFLAGS		:= -E -MM
